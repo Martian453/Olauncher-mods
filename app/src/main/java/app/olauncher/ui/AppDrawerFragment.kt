@@ -35,6 +35,7 @@ import app.olauncher.helper.openUrl
 import app.olauncher.helper.showKeyboard
 import app.olauncher.helper.showToast
 import app.olauncher.helper.uninstall
+import app.olauncher.helper.DisciplineManager
 
 class AppDrawerFragment : BaseFragment() {
 
@@ -151,11 +152,24 @@ class AppDrawerFragment : BaseFragment() {
             flag,
             prefs.appLabelAlignment,
             appClickListener = { appModel ->
-                viewModel.selectedApp(appModel, flag)
-                if (flag == Constants.FLAG_LAUNCH_APP || flag == Constants.FLAG_HIDDEN_APPS)
-                    findNavController().popBackStack(R.id.mainFragment, false)
-                else
-                    findNavController().popBackStack()
+                val doLaunch: () -> Unit = {
+                    viewModel.selectedApp(appModel, flag)
+                    if (flag == Constants.FLAG_LAUNCH_APP || flag == Constants.FLAG_HIDDEN_APPS)
+                        findNavController().popBackStack(R.id.mainFragment, false)
+                    else
+                        findNavController().popBackStack()
+                }
+
+                if (flag == Constants.FLAG_LAUNCH_APP && appModel is AppModel.App && DisciplineManager.isAppDistracting(requireContext(), appModel.appPackage)) {
+                    LaunchFrictionDialog.show(
+                        context = requireContext(),
+                        appName = appModel.appLabel,
+                        packageName = appModel.appPackage,
+                        onProceedLaunch = doLaunch
+                    )
+                } else {
+                    doLaunch()
+                }
             },
             appInfoListener = {
                 openAppInfo(

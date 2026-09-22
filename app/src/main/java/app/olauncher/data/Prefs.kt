@@ -644,4 +644,116 @@ class Prefs(context: Context) {
     fun getAppRenameLabel(appPackage: String): String = prefs.getString(appPackage, "").toString()
 
     fun setAppRenameLabel(appPackage: String, renameLabel: String) = prefs.edit { putString(appPackage, renameLabel) }
+
+    // --- 100-Day Challenge & Discipline Preferences ---
+    private val CHALLENGE_START_DATE = "CHALLENGE_START_DATE"
+    private val CHALLENGE_TARGET_DAYS = "CHALLENGE_TARGET_DAYS"
+    private val CHALLENGE_ENABLED = "CHALLENGE_ENABLED"
+
+    private val DETOX_STREAK = "DETOX_STREAK"
+    private val DETOX_LAST_CHECK_DATE = "DETOX_LAST_CHECK_DATE"
+    private val DETOX_START_DATE = "DETOX_START_DATE"
+
+    private val PICKUP_COUNT = "PICKUP_COUNT"
+    private val LAST_PICKUP_DATE = "LAST_PICKUP_DATE"
+    private val PICKUP_LIMIT = "PICKUP_LIMIT"
+    private val PICKUP_SLAP_ENABLED = "PICKUP_SLAP_ENABLED"
+
+    private val DISTRACTING_APPS = "DISTRACTING_APPS"
+    private val APP_TIME_LIMITS = "APP_TIME_LIMITS"
+    private val ANTI_CHEAT_COOLDOWN_SECONDS = "ANTI_CHEAT_COOLDOWN_SECONDS"
+    private val ANTI_CHEAT_PLEDGE = "ANTI_CHEAT_PLEDGE"
+
+    private val DAILY_TASKS_JSON = "DAILY_TASKS_JSON"
+    private val DEFAULT_HABITS_JSON = "DEFAULT_HABITS_JSON"
+    private val LAST_TASKS_DATE = "LAST_TASKS_DATE"
+    private val EVENING_REVIEW_TIME = "EVENING_REVIEW_TIME"
+
+    var challengeStartDate: Long
+        get() = prefs.getLong(CHALLENGE_START_DATE, 0L)
+        set(value) = prefs.edit { putLong(CHALLENGE_START_DATE, value).apply() }
+
+    var challengeTargetDays: Int
+        get() = prefs.getInt(CHALLENGE_TARGET_DAYS, 100)
+        set(value) = prefs.edit { putInt(CHALLENGE_TARGET_DAYS, value).apply() }
+
+    var isChallengeEnabled: Boolean
+        get() = prefs.getBoolean(CHALLENGE_ENABLED, true)
+        set(value) = prefs.edit { putBoolean(CHALLENGE_ENABLED, value).apply() }
+
+    var detoxStreak: Int
+        get() = prefs.getInt(DETOX_STREAK, 1)
+        set(value) = prefs.edit { putInt(DETOX_STREAK, value).apply() }
+
+    var detoxLastCheckDate: String
+        get() = prefs.getString(DETOX_LAST_CHECK_DATE, "").toString()
+        set(value) = prefs.edit { putString(DETOX_LAST_CHECK_DATE, value).apply() }
+
+    var detoxStartDate: Long
+        get() = prefs.getLong(DETOX_START_DATE, 0L)
+        set(value) = prefs.edit { putLong(DETOX_START_DATE, value).apply() }
+
+    var pickupCount: Int
+        get() = prefs.getInt(PICKUP_COUNT, 0)
+        set(value) = prefs.edit { putInt(PICKUP_COUNT, value).apply() }
+
+    var lastPickupDate: String
+        get() = prefs.getString(LAST_PICKUP_DATE, "").toString()
+        set(value) = prefs.edit { putString(LAST_PICKUP_DATE, value).apply() }
+
+    var pickupLimit: Int
+        get() = prefs.getInt(PICKUP_LIMIT, 50)
+        set(value) = prefs.edit { putInt(PICKUP_LIMIT, value).apply() }
+
+    var pickupSlapEnabled: Boolean
+        get() = prefs.getBoolean(PICKUP_SLAP_ENABLED, true)
+        set(value) = prefs.edit { putBoolean(PICKUP_SLAP_ENABLED, value).apply() }
+
+    var distractingApps: Set<String>
+        get() = prefs.getStringSet(DISTRACTING_APPS, emptySet()) ?: emptySet()
+        set(value) = prefs.edit { putStringSet(DISTRACTING_APPS, value).apply() }
+
+    var appTimeLimits: String
+        get() = prefs.getString(APP_TIME_LIMITS, "").toString()
+        set(value) = prefs.edit { putString(APP_TIME_LIMITS, value).apply() }
+
+    var antiCheatCooldownSeconds: Int
+        get() = prefs.getInt(ANTI_CHEAT_COOLDOWN_SECONDS, 60)
+        set(value) = prefs.edit { putInt(ANTI_CHEAT_COOLDOWN_SECONDS, value).apply() }
+
+    var antiCheatPledge: String
+        get() = prefs.getString(ANTI_CHEAT_PLEDGE, "I am breaking my self-improvement promise").toString()
+        set(value) = prefs.edit { putString(ANTI_CHEAT_PLEDGE, value).apply() }
+
+    var dailyTasksJson: String
+        get() = prefs.getString(DAILY_TASKS_JSON, "").toString()
+        set(value) = prefs.edit { putString(DAILY_TASKS_JSON, value).apply() }
+
+    var defaultHabitsJson: String
+        get() = prefs.getString(DEFAULT_HABITS_JSON, "").toString()
+        set(value) = prefs.edit { putString(DEFAULT_HABITS_JSON, value).apply() }
+
+    var lastTasksDate: String
+        get() = prefs.getString(LAST_TASKS_DATE, "").toString()
+        set(value) = prefs.edit { putString(LAST_TASKS_DATE, value).apply() }
+
+    var eveningReviewTime: String
+        get() = prefs.getString(EVENING_REVIEW_TIME, "21:00").toString()
+        set(value) = prefs.edit { putString(EVENING_REVIEW_TIME, value).apply() }
+
+    private val EMERGENCY_PASS_PACKAGE = "EMERGENCY_PASS_PACKAGE"
+    private val EMERGENCY_PASS_EXPIRY = "EMERGENCY_PASS_EXPIRY"
+    private val EMERGENCY_PASSES_TODAY = "EMERGENCY_PASSES_TODAY"
+
+    var emergencyPassPackage: String
+        get() = prefs.getString(EMERGENCY_PASS_PACKAGE, "").toString()
+        set(value) = prefs.edit { putString(EMERGENCY_PASS_PACKAGE, value).apply() }
+
+    var emergencyPassExpiry: Long
+        get() = prefs.getLong(EMERGENCY_PASS_EXPIRY, 0L)
+        set(value) = prefs.edit { putLong(EMERGENCY_PASS_EXPIRY, value).apply() }
+
+    var emergencyPassesToday: Int
+        get() = prefs.getInt(EMERGENCY_PASSES_TODAY, 0)
+        set(value) = prefs.edit { putInt(EMERGENCY_PASSES_TODAY, value).apply() }
 }

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="24dp">
+
+        <TextView
+            style="@style/TextLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Evening Review"
+            android:textColor="?attr/primaryColor"
+            android:textSize="22sp" />
+
+        <TextView
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Take 30 seconds to lock in today's progress and prepare tomorrow."
+            android:textColor="?attr/primaryColorTrans80" />
+
+        <!-- Detox Question -->
+        <TextView
+            style="@style/TextSmallBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Did you stay clean today?"
+            android:textColor="?attr/primaryColor" />
+
+        <RadioGroup
+            android:id="@+id/rgDetoxCheck"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp">
+
+            <RadioButton
+                android:id="@+id/rbCleanYes"
+                style="@style/TextSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Yes, stayed clean! (+1 Day 🔥)"
+                android:textColor="?attr/primaryColor" />
+
+            <RadioButton
+                android:id="@+id/rbCleanNo"
+                style="@style/TextSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No, I slipped up (Reset streak to 0)"
+                android:textColor="?attr/primaryColorTrans80" />
+        </RadioGroup>
+
+        <!-- Tomorrow's 5 Tasks Header -->
+        <TextView
+            style="@style/TextSmallBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Tomorrow's 5 Non-Negotiable Tasks:"
+            android:textColor="?attr/primaryColor" />
+
+        <EditText
+            android:id="@+id/etTomorrowTask1"
+            style="@style/TextSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:hint="1. Task"
+            android:textColor="?attr/primaryColor" />
+
+        <EditText
+            android:id="@+id/etTomorrowTask2"
+            style="@style/TextSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:hint="2. Task"
+            android:textColor="?attr/primaryColor" />
+
+        <EditText
+            android:id="@+id/etTomorrowTask3"
+            style="@style/TextSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:hint="3. Task"
+            android:textColor="?attr/primaryColor" />
+
+        <EditText
+            android:id="@+id/etTomorrowTask4"
+            style="@style/TextSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:hint="4. Task"
+            android:textColor="?attr/primaryColor" />
+
+        <EditText
+            android:id="@+id/etTomorrowTask5"
+            style="@style/TextSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:hint="5. Task"
+            android:textColor="?attr/primaryColor" />
+
+        <!-- Submit Button -->
+        <TextView
+            android:id="@+id/btnSaveEveningReview"
+            style="@style/TextSmallBold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/rounded_rect_shade_color"
+            android:gravity="center"
+            android:padding="14dp"
+            android:text="Lock In Tomorrow"
+            android:textColor="?attr/primaryColor"
+            android:textSize="17sp" />
+
+    </LinearLayout>
+</ScrollView>

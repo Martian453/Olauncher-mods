@@ -217,6 +217,219 @@
 
             </LinearLayout>
 
+            <!-- 100-Day Discipline & Detox Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="12dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/rounded_rect_shade_color"
+                android:orientation="vertical"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="16dp">
+
+                <TextView
+                    style="@style/TextLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="100-Day Discipline"
+                    android:textColor="?attr/primaryColor" />
+
+                <!-- 100-Day Challenge -->
+                <FrameLayout
+                    android:id="@+id/cardChallenge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <TextView
+                        style="@style/TextSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingVertical="8dp"
+                        android:text="100-Day Challenge"
+                        android:textColor="?attr/primaryColor" />
+
+                    <TextView
+                        android:id="@+id/tvChallengeDaySetting"
+                        style="@style/TextSmallBold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_marginEnd="4dp"
+                        android:padding="8dp"
+                        android:text="Day 1 of 100" />
+                </FrameLayout>
+
+                <!-- Detox Streak -->
+                <FrameLayout
+                    android:id="@+id/cardDetoxStreak"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <TextView
+                        style="@style/TextSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingVertical="8dp"
+                        android:text="Detox Streak"
+                        android:textColor="?attr/primaryColor" />
+
+                    <TextView
+                        android:id="@+id/tvDetoxStreakSetting"
+                        style="@style/TextSmallBold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_marginEnd="4dp"
+                        android:padding="8dp"
+                        android:text="1 Day 🔥" />
+                </FrameLayout>
+
+                <!-- 5 Daily Habits -->
+                <FrameLayout
+                    android:id="@+id/cardDailyHabits"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <TextView
+                        style="@style/TextSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingVertical="8dp"
+                        android:text="5 Daily Habits"
+                        android:textColor="?attr/primaryColor" />
+
+                    <TextView
+                        android:id="@+id/tvDailyHabitsSetting"
+                        style="@style/TextSmallBold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_marginEnd="4dp"
+                        android:padding="8dp"
+                        android:text="Configure" />
+                </FrameLayout>
+
+                <!-- Daily Pickup Limit -->
+                <FrameLayout
+                    android:id="@+id/cardPickupLimit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <TextView
+                        style="@style/TextSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingVertical="8dp"
+                        android:text="Daily Pickup Limit"
+                        android:textColor="?attr/primaryColor" />
+
+                    <TextView
+                        android:id="@+id/tvPickupLimitSetting"
+                        style="@style/TextSmallBold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_marginEnd="4dp"
+                        android:padding="8dp"
+                        android:text="50 Pickups" />
+                </FrameLayout>
+
+                <!-- Distracting Apps & Limits -->
+                <FrameLayout
+                    android:id="@+id/cardDistractingApps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <TextView
+                        style="@style/TextSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingVertical="8dp"
+                        android:text="Distracting Apps &amp; Limits"
+                        android:textColor="?attr/primaryColor" />
+
+                    <TextView
+                        android:id="@+id/tvDistractingAppsSetting"
+                        style="@style/TextSmallBold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_marginEnd="4dp"
+                        android:padding="8dp"
+                        android:text="Manage" />
+                </FrameLayout>
+
+                <!-- Anti-Cheat Lock -->
+                <FrameLayout
+                    android:id="@+id/cardAntiCheat"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <TextView
+                        style="@style/TextSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingVertical="8dp"
+                        android:text="Anti-Cheat Lock"
+                        android:textColor="?attr/primaryColor" />
+
+                    <TextView
+                        android:id="@+id/tvAntiCheatSetting"
+                        style="@style/TextSmallBold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_marginEnd="4dp"
+                        android:padding="8dp"
+                        android:text="60s Cooldown" />
+                </FrameLayout>
+
+                <!-- Backup & Restore -->
+                <FrameLayout
+                    android:id="@+id/cardBackupRestore"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="4dp">
+
+                    <TextView
+                        style="@style/TextSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingVertical="8dp"
+                        android:text="Backup &amp; Restore"
+                        android:textColor="?attr/primaryColor" />
+
+                    <TextView
+                        android:id="@+id/tvBackupRestoreSetting"
+                        style="@style/TextSmallBold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_marginEnd="4dp"
+                        android:padding="8dp"
+                        android:text="Export / Import" />
+                </FrameLayout>
+
+            </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

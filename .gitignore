@@ -16,3 +16,8 @@
 .externalNativeBuild
 .cxx
 google-services.json
+*.apk
+*.jpg
+*.jpeg
+*.png
+plan_text.txt

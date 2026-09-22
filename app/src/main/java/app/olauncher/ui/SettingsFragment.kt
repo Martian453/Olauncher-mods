@@ -13,7 +13,9 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +25,7 @@ import app.olauncher.MainViewModel
 import app.olauncher.R
 import app.olauncher.data.Constants
 import app.olauncher.data.Prefs
+import app.olauncher.helper.DisciplineManager
 import app.olauncher.databinding.DialogTextSizeBinding
 import app.olauncher.databinding.FragmentSettingsBinding
 import app.olauncher.helper.appUsagePermissionGranted
@@ -90,6 +93,7 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         populateDateTime()
         populateSwipeApps()
         populateActionHints()
+        populateDisciplineSettings()
         initClickListeners()
         initObservers()
 
@@ -99,6 +103,13 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
 
     override fun onClick(view: View) {
         when (view.id) {
+            R.id.cardChallenge -> showChallengeDialog()
+            R.id.cardDetoxStreak -> showDetoxStreakDialog()
+            R.id.cardDailyHabits -> showConfigureHabitsDialog()
+            R.id.cardPickupLimit -> showPickupLimitDialog()
+            R.id.cardDistractingApps -> showDistractingAppsWithAntiCheat()
+            R.id.cardAntiCheat -> showAntiCheatSettingsDialog()
+            R.id.cardBackupRestore -> showBackupRestoreDialog()
             R.id.olauncherHiddenApps -> showHiddenApps()
             R.id.moreFeatures -> viewModel.showDialog.postValue(Constants.Dialog.PRO_MESSAGE)
             R.id.screenTimeOnOff -> viewModel.showDialog.postValue(Constants.Dialog.DIGITAL_WELLBEING)
@@ -161,6 +172,13 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
     }
 
     private fun initClickListeners() {
+        binding.cardChallenge.setOnClickListener(this)
+        binding.cardDetoxStreak.setOnClickListener(this)
+        binding.cardDailyHabits.setOnClickListener(this)
+        binding.cardPickupLimit.setOnClickListener(this)
+        binding.cardDistractingApps.setOnClickListener(this)
+        binding.cardAntiCheat.setOnClickListener(this)
+        binding.cardBackupRestore.setOnClickListener(this)
         binding.olauncherHiddenApps.setOnClickListener(this)
         binding.appInfo.setOnClickListener(this)
         binding.setLauncher.setOnClickListener(this)
@@ -364,11 +382,144 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
             requireContext().showToast(getString(R.string.no_hidden_apps))
             return
         }
-        viewModel.getHiddenApps()
-        findNavController().navigate(
-            R.id.action_settingsFragment_to_appListFragment,
-            bundleOf(Constants.Key.FLAG to Constants.FLAG_HIDDEN_APPS)
-        )
+        AntiCheatDialog.show(requireContext()) {
+            viewModel.getHiddenApps()
+            findNavController().navigate(
+                R.id.action_settingsFragment_to_appListFragment,
+                bundleOf(Constants.Key.FLAG to Constants.FLAG_HIDDEN_APPS)
+            )
+        }
+    }
+
+    private fun populateDisciplineSettings() {
+        val currentDay = DisciplineManager.getCurrentChallengeDay(requireContext())
+        binding.tvChallengeDaySetting.text = "Day $currentDay of ${prefs.challengeTargetDays}"
+        binding.tvDetoxStreakSetting.text = "${prefs.detoxStreak} ${if (prefs.detoxStreak == 1) "Day" else "Days"} 🔥"
+        binding.tvDailyHabitsSetting.text = "Configure"
+        binding.tvPickupLimitSetting.text = "${prefs.pickupLimit} Pickups"
+        binding.tvDistractingAppsSetting.text = "${prefs.distractingApps.size} Apps"
+        binding.tvAntiCheatSetting.text = "${prefs.antiCheatCooldownSeconds}s Cooldown"
+    }
+
+    private fun showChallengeDialog() {
+        val input = EditText(requireContext())
+        input.inputType = android.text.InputType.TYPE_CLASS_NUMBER
+        input.setText(prefs.challengeTargetDays.toString())
+        AlertDialog.Builder(requireContext())
+            .setTitle("100-Day Challenge Target")
+            .setMessage("Set your goal target days (default 100):")
+            .setView(input)
+            .setPositiveButton(R.string.okay) { _, _ ->
+                val days = input.text.toString().toIntOrNull() ?: 100
+                prefs.challengeTargetDays = days.coerceAtLeast(1)
+                populateDisciplineSettings()
+                viewModel.refreshHome.postValue(false)
+            }
+            .setNeutralButton("Reset Start Date to Today") { _, _ ->
+                val cal = java.util.Calendar.getInstance().apply {
+                    set(java.util.Calendar.HOUR_OF_DAY, 0)
+                    set(java.util.Calendar.MINUTE, 0)
+                    set(java.util.Calendar.SECOND, 0)
+                    set(java.util.Calendar.MILLISECOND, 0)
+                }
+                prefs.challengeStartDate = cal.timeInMillis
+                populateDisciplineSettings()
+                viewModel.refreshHome.postValue(false)
+                requireContext().showToast("Challenge reset to Day 1. You got this!")
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun showDetoxStreakDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Detox Streak")
+            .setMessage("Current clean streak: ${prefs.detoxStreak} days 🔥\n\nStay disciplined and take it one day at a time.")
+            .setPositiveButton("Keep Going", null)
+            .setNeutralButton("Reset Streak to 0") { _, _ ->
+                prefs.detoxStreak = 0
+                prefs.detoxStartDate = System.currentTimeMillis()
+                populateDisciplineSettings()
+                viewModel.refreshHome.postValue(false)
+                requireContext().showToast("Streak reset. Pick yourself up and start fresh!")
+            }
+            .show()
+    }
+
+    private fun showConfigureHabitsDialog() {
+        val habits = DisciplineManager.getDefaultHabits(requireContext())
+        val input = EditText(requireContext()).apply {
+            isSingleLine = false
+            setLines(6)
+            setText(habits.joinToString("\n"))
+        }
+        AlertDialog.Builder(requireContext())
+            .setTitle("5 Default Habits")
+            .setMessage("Enter your 5 non-negotiable habits (one per line):")
+            .setView(input)
+            .setPositiveButton(R.string.okay) { _, _ ->
+                val lines = input.text.toString().split("\n")
+                    .map { it.trim() }
+                    .filter { it.isNotBlank() }
+                    .take(5)
+                if (lines.isNotEmpty()) {
+                    DisciplineManager.setDefaultHabits(requireContext(), lines)
+                    populateDisciplineSettings()
+                    viewModel.refreshHome.postValue(false)
+                    requireContext().showToast("Habits updated!")
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun showPickupLimitDialog() {
+        val options = arrayOf("30 Pickups / Day (Hardcore)", "40 Pickups / Day (Disciplined)", "50 Pickups / Day (Balanced)", "60 Pickups / Day", "75 Pickups / Day")
+        val values = arrayOf(30, 40, 50, 60, 75)
+        AlertDialog.Builder(requireContext())
+            .setTitle("Daily Pickup Limit")
+            .setItems(options) { _, which ->
+                prefs.pickupLimit = values[which]
+                populateDisciplineSettings()
+                viewModel.refreshHome.postValue(false)
+                requireContext().showToast("Limit set to ${values[which]} pickups")
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun showDistractingAppsWithAntiCheat() {
+        AntiCheatDialog.show(requireContext()) {
+            ManageDistractingAppsDialog.show(requireContext()) {
+                populateDisciplineSettings()
+                viewModel.getAppList()
+                viewModel.refreshHome.postValue(false)
+            }
+        }
+    }
+
+    private fun showAntiCheatSettingsDialog() {
+        AntiCheatDialog.show(requireContext()) {
+            val options = arrayOf("30 Seconds Cooldown", "60 Seconds Cooldown", "90 Seconds Cooldown")
+            val values = arrayOf(30, 60, 90)
+            AlertDialog.Builder(requireContext())
+                .setTitle("Anti-Cheat Cooldown Duration")
+                .setItems(options) { _, which ->
+                    prefs.antiCheatCooldownSeconds = values[which]
+                    populateDisciplineSettings()
+                    requireContext().showToast("Cooldown set to ${values[which]}s")
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+    }
+
+    private fun showBackupRestoreDialog() {
+        BackupRestoreDialog.show(requireContext()) {
+            populateDisciplineSettings()
+            viewModel.getAppList()
+            viewModel.refreshHome.postValue(false)
+        }
     }
 
     private fun checkAdminPermission() {

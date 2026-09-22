@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="28dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="28dp">
+
+    <!-- App Name & Icon/Label -->
+    <TextView
+        android:id="@+id/tvFrictionAppName"
+        style="@style/TextLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/primaryColor"
+        android:textSize="24sp"
+        tools:text="Instagram" />
+
+    <!-- State 1: Breathing Countdown Section -->
+    <LinearLayout
+        android:id="@+id/layoutBreathingCountdown"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/tvCountdownSeconds"
+            style="@style/TextLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textColor="?attr/primaryColor"
+            android:textSize="56sp"
+            tools:text="10" />
+
+        <TextView
+            android:id="@+id/tvBreathingPrompt"
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Take a deep breath.\nAre you opening this on autopilot?"
+            android:textColor="?attr/primaryColorTrans80"
+            android:textSize="16sp" />
+
+        <!-- Prominent Exit Button -->
+        <TextView
+            android:id="@+id/btnPutPhoneDown"
+            style="@style/TextSmallBold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/rounded_rect_shade_color"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="Put Phone Down"
+            android:textColor="?attr/primaryColor"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <!-- State 2: Math Conscious Gate Section -->
+    <LinearLayout
+        android:id="@+id/layoutMathGate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Solve this conscious check to continue:"
+            android:textColor="?attr/primaryColorTrans80" />
+
+        <TextView
+            android:id="@+id/tvMathProblem"
+            style="@style/TextLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="?attr/primaryColor"
+            android:textSize="28sp"
+            tools:text="34 + 29 = ?" />
+
+        <EditText
+            android:id="@+id/etMathAnswer"
+            style="@style/TextLarge"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:hint="Answer"
+            android:inputType="number"
+            android:textColor="?attr/primaryColor"
+            android:textColorHint="?attr/primaryColorTrans50" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btnCancelGate"
+                style="@style/TextSmall"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="12dp"
+                android:text="Cancel"
+                android:textColor="?attr/primaryColorTrans80" />
+
+            <TextView
+                android:id="@+id/btnUnlockApp"
+                style="@style/TextSmallBold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="12dp"
+                android:text="Open App"
+                android:textColor="?attr/primaryColor"
+                android:textSize="17sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- State 3: Hard Lockout Section -->
+    <LinearLayout
+        android:id="@+id/layoutHardLockout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/TextLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="⛔ Daily Limit Finished"
+            android:textColor="?attr/primaryColor"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/tvLockoutMessage"
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="You have used all of your allotted time for this app today.\nStay committed to your 100-Day Challenge!"
+            android:textColor="?attr/primaryColorTrans80"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/btnLockoutExit"
+            style="@style/TextSmallBold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/rounded_rect_shade_color"
+            android:gravity="center"
+            android:padding="14dp"
+            android:text="I Will Stay Strong"
+            android:textColor="?attr/primaryColor"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/btnEmergencyBypass"
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="🚨 Request 5-Min Emergency Pass"
+            android:textColor="?attr/primaryColorTrans50"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- State 4: Emergency Override Form -->
+    <LinearLayout
+        android:id="@+id/layoutEmergencyForm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/TextLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="🚨 Emergency Override"
+            android:textColor="?attr/primaryColor"
+            android:textSize="22sp" />
+
+        <TextView
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="5-minute temporary pass.\nState your genuine reason below to maintain accountability."
+            android:textColor="?attr/primaryColorTrans80"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etEmergencyReason"
+            style="@style/TextSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_rect_shade_color"
+            android:gravity="top|start"
+            android:hint="Type reason here (min 10 characters)..."
+            android:inputType="textMultiLine"
+            android:lines="3"
+            android:padding="12dp"
+            android:textColor="?attr/primaryColor"
+            android:textColorHint="?attr/primaryColorTrans50" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btnCancelEmergency"
+                style="@style/TextSmall"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:padding="12dp"
+                android:text="Cancel"
+                android:textColor="?attr/primaryColorTrans80" />
+
+            <TextView
+                android:id="@+id/btnConfirmEmergency"
+                style="@style/TextSmallBold"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.2"
+                android:gravity="center"
+                android:padding="12dp"
+                android:text="Grant 5-Min Pass"
+                android:textColor="?attr/primaryColor"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

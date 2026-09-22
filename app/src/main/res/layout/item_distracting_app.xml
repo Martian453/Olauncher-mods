@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingVertical="8dp">
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/cbDistractingApp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:buttonTint="?attr/primaryColor" />
+
+    <TextView
+        android:id="@+id/tvDistractingAppName"
+        style="@style/TextMedium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_weight="1"
+        android:textColor="?attr/primaryColor"
+        android:textSize="16sp"
+        tools:text="Instagram" />
+
+    <TextView
+        android:id="@+id/tvLimitLabel"
+        style="@style/TextSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:padding="6dp"
+        android:textColor="?attr/primaryColorTrans80"
+        tools:text="30m limit" />
+
+</LinearLayout>

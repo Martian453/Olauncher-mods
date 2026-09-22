@@ -23,6 +23,7 @@ import app.olauncher.databinding.AdapterPrivateSpaceHeaderBinding
 import app.olauncher.helper.hideKeyboard
 import app.olauncher.helper.isSystemApp
 import app.olauncher.helper.showKeyboard
+import app.olauncher.helper.DisciplineManager
 import java.text.Normalizer
 
 class AppDrawerAdapter(
@@ -158,6 +159,13 @@ class AppDrawerAdapter(
         }
     }
 
+    private var context: Context? = null
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        context = recyclerView.context
+    }
+
     private fun autoLaunch() {
         try {
             if (itemCount == 1
@@ -166,7 +174,15 @@ class AppDrawerAdapter(
                 && flag == Constants.FLAG_LAUNCH_APP
                 && appFilteredList.isNotEmpty()
                 && appFilteredList[0] !is AppModel.PrivateSpaceHeader
-            ) appClickListener(appFilteredList[0])
+            ) {
+                val app = appFilteredList[0]
+                context?.let { ctx ->
+                    if (app.appPackage.isNotEmpty() && DisciplineManager.isAppDistracting(ctx, app.appPackage)) {
+                        return
+                    }
+                }
+                appClickListener(app)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -242,6 +258,9 @@ class AppDrawerAdapter(
             appTitle.text = buildString {
                 append(appModel.appLabel)
                 if (appModel.isNew) append(" ✦")
+                if (appModel.appPackage.isNotEmpty() && DisciplineManager.isAppDistracting(root.context, appModel.appPackage)) {
+                    append(" ⏳")
+                }
             }
             appTitle.gravity = appLabelGravity
             otherProfileIndicator.isVisible = appModel.user != myUserHandle

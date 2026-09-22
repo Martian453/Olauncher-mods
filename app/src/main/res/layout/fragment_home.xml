@@ -54,6 +54,40 @@
             android:paddingHorizontal="3dp"
             android:textSize="@dimen/date_size"
             tools:text="Thu, 30 Dec" />
+
+        <TextView
+            android:id="@+id/tvDisciplineBanner"
+            style="@style/TextDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingHorizontal="3dp"
+            android:paddingVertical="3dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="17sp"
+            android:textColor="?attr/primaryColor"
+            android:letterSpacing="0.02"
+            tools:text="Day 1/100 • Detox 1🔥 • Tasks 3/5"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <ProgressBar
+            android:id="@+id/progressBarMicro"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="160dp"
+            android:layout_height="2.5dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginStart="3dp"
+            android:max="100"
+            android:progress="1"
+            android:progressTint="?attr/primaryColor"
+            android:progressBackgroundTint="?attr/primaryColorTrans50"
+            android:indeterminate="false"
+            android:visibility="gone"
+            tools:visibility="visible" />
     </LinearLayout>
 
     <!-- Screen time-->
@@ -72,15 +106,64 @@
         tools:text="2h 11m"
         tools:visibility="visible" />
 
+    <!-- Progressive Reflection Slap Overlay -->
+    <FrameLayout
+        android:id="@+id/layoutPickupSlap"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#DD000000"
+        android:clickable="true"
+        android:elevation="20dp"
+        android:focusable="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp">
+
+            <TextView
+                style="@style/TextLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🚨 Excessive Pickups"
+                android:textColor="#FFFF5555"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/tvPickupSlapMessage"
+                style="@style/TextMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="You have unlocked your phone too many times today.\nPut it away and get back to your 100-Day goals!"
+                android:textColor="#FFFFFFFF"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/tvPickupSlapCountdown"
+                style="@style/TextSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="Resuming in 5s..."
+                android:textColor="#FFAAAAAA" />
+        </LinearLayout>
+    </FrameLayout>
+
     <!-- Home apps-->
     <LinearLayout
         android:id="@+id/homeAppsLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_vertical"
+        android:gravity="top"
         android:orientation="vertical"
         android:paddingHorizontal="24dp"
-        android:paddingTop="112dp"
+        android:paddingTop="195dp"
         android:paddingBottom="48dp">
 
         <TextView

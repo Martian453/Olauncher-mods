@@ -48,6 +48,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import app.olauncher.helper.DisciplineManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -60,6 +61,17 @@ class MainActivity : AppCompatActivity() {
     private var profileReceiver: BroadcastReceiver? = null
     private var launcherAppsCallback: LauncherApps.Callback? = null
     private var messageDialog: OlDialog? = null
+
+    private val unlockReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == Intent.ACTION_USER_PRESENT) {
+                context?.let { ctx ->
+                    DisciplineManager.onPhoneUnlocked(ctx)
+                    viewModel.refreshHome.postValue(false)
+                }
+            }
+        }
+    }
 
 //    override fun onBackPressed() {
 //        if (navController.currentDestination?.id != R.id.mainFragment)
@@ -108,6 +120,9 @@ class MainActivity : AppCompatActivity() {
         registerShortcutCallback()
         setupOrientation()
 
+        DisciplineManager.initializeIfNeeded(this)
+        registerReceiver(unlockReceiver, IntentFilter(Intent.ACTION_USER_PRESENT))
+
         window.addFlags(FLAG_LAYOUT_NO_LIMITS)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
@@ -135,6 +150,8 @@ class MainActivity : AppCompatActivity() {
         isResumed = true
         viewModel.isPrivateSpaceToggling = false
         viewModel.getAppList()
+        DisciplineManager.checkDateRollover(this)
+        viewModel.refreshHome.postValue(false)
     }
 
     private fun registerShortcutCallback() {
@@ -394,6 +411,10 @@ class MainActivity : AppCompatActivity() {
                 unregisterReceiver(it)
             } catch (_: Exception) {
             }
+        }
+        try {
+            unregisterReceiver(unlockReceiver)
+        } catch (_: Exception) {
         }
         super.onDestroy()
     }

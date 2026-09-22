@@ -1,8 +1,8 @@
-![Olauncher](https://repository-images.githubusercontent.com/278638069/db0acb80-661b-11eb-803e-926cae5dccb4)
+# Olauncher-mods
 
+A customized discipline & anti-doomscrolling mod for Olauncher with habit tracking, daily focus limits, and launch friction gates.
 
-# Olauncher | Minimal AF Launcher
-AF stands for Ad-Free! :D
+Based on [Olauncher](https://github.com/tanujnotes/Olauncher) by Tanuj.
 
 [<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
     alt="Get it on Play Store"
