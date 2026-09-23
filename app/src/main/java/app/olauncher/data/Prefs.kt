@@ -722,7 +722,7 @@ class Prefs(context: Context) {
         set(value) = prefs.edit { putInt(ANTI_CHEAT_COOLDOWN_SECONDS, value).apply() }
 
     var antiCheatPledge: String
-        get() = prefs.getString(ANTI_CHEAT_PLEDGE, "I am breaking my self-improvement promise").toString()
+        get() = prefs.getString(ANTI_CHEAT_PLEDGE, "I am adjusting my protocol limits").toString()
         set(value) = prefs.edit { putString(ANTI_CHEAT_PLEDGE, value).apply() }
 
     var dailyTasksJson: String
@@ -756,4 +756,26 @@ class Prefs(context: Context) {
     var emergencyPassesToday: Int
         get() = prefs.getInt(EMERGENCY_PASSES_TODAY, 0)
         set(value) = prefs.edit { putInt(EMERGENCY_PASSES_TODAY, value).apply() }
-}
+
+    // --- Habit & Streak Tracker Preferences ---
+    private val HABIT_STREAK_COUNT = "HABIT_STREAK_COUNT"
+    private val BEST_HABIT_STREAK = "BEST_HABIT_STREAK"
+    private val HABIT_STREAK_REQUIREMENT = "HABIT_STREAK_REQUIREMENT"
+    private val HABIT_HISTORY_JSON = "HABIT_HISTORY_JSON"
+
+    var habitStreakCount: Int
+        get() = prefs.getInt(HABIT_STREAK_COUNT, 0)
+        set(value) = prefs.edit { putInt(HABIT_STREAK_COUNT, value).apply() }
+
+    var bestHabitStreak: Int
+        get() = prefs.getInt(BEST_HABIT_STREAK, 0)
+        set(value) = prefs.edit { putInt(BEST_HABIT_STREAK, value).apply() }
+
+    var habitStreakRequirement: Int
+        get() = prefs.getInt(HABIT_STREAK_REQUIREMENT, 80)
+        set(value) = prefs.edit { putInt(HABIT_STREAK_REQUIREMENT, value).apply() }
+
+    var habitHistoryJson: String
+        get() = prefs.getString(HABIT_HISTORY_JSON, "").toString()
+        set(value) = prefs.edit { putString(HABIT_HISTORY_JSON, value).apply() }
+}

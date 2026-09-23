@@ -16,6 +16,16 @@ data class DailyTask(
     var isCompleted: Boolean
 )
 
+data class DayRecord(
+    val date: String,
+    val label: String,
+    val completed: Int,
+    val total: Int,
+    val rate: Int,
+    val success: Boolean,
+    val isToday: Boolean = false
+)
+
 object DisciplineManager {
 
     private fun getTodayDateString(): String {
@@ -31,9 +41,6 @@ object DisciplineManager {
             calendar.set(Calendar.SECOND, 0)
             calendar.set(Calendar.MILLISECOND, 0)
             prefs.challengeStartDate = calendar.timeInMillis
-        }
-        if (prefs.detoxStartDate == 0L) {
-            prefs.detoxStartDate = System.currentTimeMillis()
         }
         if (prefs.defaultHabitsJson.isBlank()) {
             val defaults = listOf(
@@ -59,8 +66,31 @@ object DisciplineManager {
             prefs.emergencyPassesToday = 0
         }
 
-        // Check tasks rollover
+        // Check tasks rollover & score yesterday's streak
         if (prefs.lastTasksDate != today) {
+            val previousDate = prefs.lastTasksDate
+            if (previousDate.isNotBlank() && prefs.dailyTasksJson.isNotBlank()) {
+                val prevTasks = parseTasks(prefs.dailyTasksJson)
+                if (prevTasks.isNotEmpty()) {
+                    val completedCount = prevTasks.count { it.isCompleted }
+                    val totalCount = prevTasks.size
+                    val rate = ((completedCount.toFloat() / totalCount.toFloat()) * 100).toInt()
+                    val req = prefs.habitStreakRequirement
+                    val success = rate >= req
+
+                    if (success) {
+                        prefs.habitStreakCount += 1
+                        if (prefs.habitStreakCount > prefs.bestHabitStreak) {
+                            prefs.bestHabitStreak = prefs.habitStreakCount
+                        }
+                    } else {
+                        prefs.habitStreakCount = 0
+                    }
+
+                    recordHistoryEntry(context, previousDate, completedCount, totalCount, rate, success)
+                }
+            }
+
             prefs.lastTasksDate = today
             // Reset today's tasks from default habits
             val defaultHabits = getDefaultHabits(context)
@@ -100,6 +130,26 @@ object DisciplineManager {
         return prefs.pickupSlapEnabled && prefs.pickupCount > prefs.pickupLimit
     }
 
+    private fun parseTasks(jsonStr: String): List<DailyTask> {
+        return try {
+            val list = mutableListOf<DailyTask>()
+            val jsonArray = JSONArray(jsonStr)
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                list.add(
+                    DailyTask(
+                        id = obj.getInt("id"),
+                        title = obj.getString("title"),
+                        isCompleted = obj.getBoolean("isCompleted")
+                    )
+                )
+            }
+            list
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
     fun getDailyTasks(context: Context): List<DailyTask> {
         checkDateRollover(context)
         val prefs = Prefs(context)
@@ -112,32 +162,23 @@ object DisciplineManager {
             saveTasks(context, tasks)
             return tasks
         }
-
-        return try {
-            val list = mutableListOf<DailyTask>()
-            val jsonArray = JSONArray(jsonStr)
-            for (i in 0 until jsonArray.length()) {
-                val obj = jsonArray.getJSONObject(i)
-                list.add(
-                    DailyTask(
-                        id = obj.optInt("id", i + 1),
-                        title = obj.optString("title", "Task ${i + 1}"),
-                        isCompleted = obj.optBoolean("isCompleted", false)
-                    )
-                )
+        val list = parseTasks(jsonStr)
+        return if (list.isEmpty()) {
+            val defaultHabits = getDefaultHabits(context)
+            val tasks = defaultHabits.mapIndexed { index, habit ->
+                DailyTask(id = index + 1, title = habit, isCompleted = false)
             }
-            list
-        } catch (e: Exception) {
-            emptyList()
-        }
+            saveTasks(context, tasks)
+            tasks
+        } else list
     }
 
     fun toggleTask(context: Context, taskId: Int): List<DailyTask> {
         val tasks = getDailyTasks(context).toMutableList()
         val index = tasks.indexOfFirst { it.id == taskId }
         if (index != -1) {
-            val task = tasks[index]
-            tasks[index] = task.copy(isCompleted = !task.isCompleted)
+            val current = tasks[index]
+            tasks[index] = current.copy(isCompleted = !current.isCompleted)
             saveTasks(context, tasks)
         }
         return tasks
@@ -159,10 +200,18 @@ object DisciplineManager {
     fun getDefaultHabits(context: Context): List<String> {
         val prefs = Prefs(context)
         val jsonStr = prefs.defaultHabitsJson
-        if (jsonStr.isBlank()) return emptyList()
+        if (jsonStr.isBlank()) {
+            return listOf(
+                "Morning Workout (45 min)",
+                "Read 20 Pages",
+                "Deep Work Session (2 hr)",
+                "Meditation & Reflection",
+                "No Phone After 10:30 PM"
+            )
+        }
         return try {
-            val jsonArray = JSONArray(jsonStr)
             val list = mutableListOf<String>()
+            val jsonArray = JSONArray(jsonStr)
             for (i in 0 until jsonArray.length()) {
                 list.add(jsonArray.getString(i))
             }
@@ -181,6 +230,165 @@ object DisciplineManager {
         prefs.defaultHabitsJson = jsonArray.toString()
     }
 
+    // --- Streak & History Helpers ---
+
+    fun getCurrentStreak(context: Context): Int {
+        val prefs = Prefs(context)
+        val baseStreak = prefs.habitStreakCount
+        val tasks = getDailyTasks(context)
+        val completed = tasks.count { it.isCompleted }
+        val total = tasks.size
+        val rate = if (total > 0) ((completed.toFloat() / total) * 100).toInt() else 0
+        val isTodayPassing = total > 0 && rate >= prefs.habitStreakRequirement
+        return if (isTodayPassing) baseStreak + 1 else baseStreak
+    }
+
+    fun getBestStreak(context: Context): Int {
+        val prefs = Prefs(context)
+        val current = getCurrentStreak(context)
+        return maxOf(prefs.bestHabitStreak, current)
+    }
+
+    fun getStreakRequirement(context: Context): Int {
+        return Prefs(context).habitStreakRequirement
+    }
+
+    fun setStreakRequirement(context: Context, percent: Int) {
+        Prefs(context).habitStreakRequirement = percent
+    }
+
+    private fun recordHistoryEntry(
+        context: Context,
+        date: String,
+        completed: Int,
+        total: Int,
+        rate: Int,
+        success: Boolean
+    ) {
+        val prefs = Prefs(context)
+        try {
+            val arr = JSONArray(if (prefs.habitHistoryJson.isNotBlank()) prefs.habitHistoryJson else "[]")
+            val obj = JSONObject().apply {
+                put("date", date)
+                put("completed", completed)
+                put("total", total)
+                put("rate", rate)
+                put("success", success)
+            }
+            arr.put(obj)
+            // Keep at most 30 days of history
+            val trimmed = JSONArray()
+            val startIdx = (arr.length() - 30).coerceAtLeast(0)
+            for (i in startIdx until arr.length()) {
+                trimmed.put(arr.getJSONObject(i))
+            }
+            prefs.habitHistoryJson = trimmed.toString()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun getRecentHistory(context: Context, daysCount: Int = 7): List<DayRecord> {
+        checkDateRollover(context)
+        val prefs = Prefs(context)
+        val historyMap = mutableMapOf<String, JSONObject>()
+        try {
+            val jsonArray = JSONArray(if (prefs.habitHistoryJson.isNotBlank()) prefs.habitHistoryJson else "[]")
+            for (i in 0 until jsonArray.length()) {
+                val obj = jsonArray.getJSONObject(i)
+                historyMap[obj.getString("date")] = obj
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        val todayStr = getTodayDateString()
+        val todayTasks = getDailyTasks(context)
+        val todayCompleted = todayTasks.count { it.isCompleted }
+        val todayTotal = todayTasks.size
+        val todayRate = if (todayTotal > 0) ((todayCompleted.toFloat() / todayTotal) * 100).toInt() else 0
+        val todaySuccess = todayTotal > 0 && todayRate >= prefs.habitStreakRequirement
+
+        val result = mutableListOf<DayRecord>()
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DAY_OF_YEAR, -(daysCount - 1))
+
+        val dayFormat = SimpleDateFormat("EEEEE", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        for (i in 0 until daysCount) {
+            val dStr = dateFormat.format(cal.time)
+            val dayLetter = dayFormat.format(cal.time).take(1).uppercase()
+            if (dStr == todayStr) {
+                result.add(
+                    DayRecord(
+                        date = dStr,
+                        label = dayLetter,
+                        completed = todayCompleted,
+                        total = todayTotal,
+                        rate = todayRate,
+                        success = todaySuccess,
+                        isToday = true
+                    )
+                )
+            } else if (historyMap.containsKey(dStr)) {
+                val obj = historyMap[dStr]!!
+                val comp = obj.optInt("completed", 0)
+                val tot = obj.optInt("total", 0)
+                val r = obj.optInt("rate", 0)
+                val s = obj.optBoolean("success", false)
+                result.add(
+                    DayRecord(
+                        date = dStr,
+                        label = dayLetter,
+                        completed = comp,
+                        total = tot,
+                        rate = r,
+                        success = s,
+                        isToday = false
+                    )
+                )
+            } else {
+                result.add(
+                    DayRecord(
+                        date = dStr,
+                        label = dayLetter,
+                        completed = 0,
+                        total = 0,
+                        rate = 0,
+                        success = false,
+                        isToday = false
+                    )
+                )
+            }
+            cal.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        return result
+    }
+
+    fun getOverallConsistencyPercent(context: Context): Int {
+        val prefs = Prefs(context)
+        return try {
+            val arr = JSONArray(if (prefs.habitHistoryJson.isNotBlank()) prefs.habitHistoryJson else "[]")
+            if (arr.length() == 0) {
+                val todayTasks = getDailyTasks(context)
+                val todayCompleted = todayTasks.count { it.isCompleted }
+                val todayTotal = todayTasks.size
+                if (todayTotal == 0) 100 else ((todayCompleted.toFloat() / todayTotal) * 100).toInt()
+            } else {
+                var wins = 0
+                for (i in 0 until arr.length()) {
+                    if (arr.getJSONObject(i).optBoolean("success", false)) wins++
+                }
+                ((wins.toFloat() / arr.length()) * 100).toInt()
+            }
+        } catch (e: Exception) {
+            100
+        }
+    }
+
+    // --- Distracting Apps & Friction Gate ---
+
     fun isAppDistracting(context: Context, packageName: String): Boolean {
         val prefs = Prefs(context)
         return prefs.distractingApps.contains(packageName)
@@ -196,7 +404,7 @@ object DisciplineManager {
     fun getAppDailyLimitMinutes(context: Context, packageName: String): Int {
         val prefs = Prefs(context)
         val jsonStr = prefs.appTimeLimits
-        if (jsonStr.isBlank()) return 30 // Default 30 minutes budget
+        if (jsonStr.isBlank()) return 30
         return try {
             val obj = JSONObject(jsonStr)
             obj.optInt(packageName, 30)
@@ -259,7 +467,7 @@ object DisciplineManager {
         if (hasActiveEmergencyPass(context, packageName)) return false
         if (!isAppDistracting(context, packageName)) return false
         val limitMinutes = getAppDailyLimitMinutes(context, packageName)
-        if (limitMinutes <= 0) return false // 0 or negative = unlimited
+        if (limitMinutes <= 0) return false
         val usedMinutes = getAppUsageTodayMinutes(context, packageName)
         return usedMinutes >= limitMinutes
     }
@@ -274,10 +482,12 @@ object DisciplineManager {
         prefs.detoxLastCheckDate = today
 
         if (stayedClean) {
-            prefs.detoxStreak += 1
+            prefs.habitStreakCount += 1
+            if (prefs.habitStreakCount > prefs.bestHabitStreak) {
+                prefs.bestHabitStreak = prefs.habitStreakCount
+            }
         } else {
-            prefs.detoxStreak = 0
-            prefs.detoxStartDate = System.currentTimeMillis()
+            prefs.habitStreakCount = 0
         }
 
         // Set tomorrow's tasks
@@ -286,7 +496,6 @@ object DisciplineManager {
                 DailyTask(id = index + 1, title = title, isCompleted = false)
             }
             saveTasks(context, newTasks)
-            // Mark last tasks date as tomorrow so it doesn't get overridden tonight
             val cal = Calendar.getInstance()
             cal.add(Calendar.DAY_OF_YEAR, 1)
             val tomorrow = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(cal.time)
@@ -297,12 +506,14 @@ object DisciplineManager {
     fun exportBackupJson(context: Context): String {
         val prefs = Prefs(context)
         val json = JSONObject()
-        json.put("version", 1)
+        json.put("version", 2)
         json.put("timestamp", System.currentTimeMillis())
         json.put("challengeStartDate", prefs.challengeStartDate)
         json.put("challengeTargetDays", prefs.challengeTargetDays)
-        json.put("detoxStreak", prefs.detoxStreak)
-        json.put("detoxStartDate", prefs.detoxStartDate)
+        json.put("habitStreakCount", prefs.habitStreakCount)
+        json.put("bestHabitStreak", prefs.bestHabitStreak)
+        json.put("habitStreakRequirement", prefs.habitStreakRequirement)
+        json.put("habitHistoryJson", prefs.habitHistoryJson)
         json.put("pickupLimit", prefs.pickupLimit)
         json.put("pickupSlapEnabled", prefs.pickupSlapEnabled)
         json.put("distractingApps", JSONArray(prefs.distractingApps.toList()))
@@ -320,8 +531,10 @@ object DisciplineManager {
             val prefs = Prefs(context)
             if (json.has("challengeStartDate")) prefs.challengeStartDate = json.getLong("challengeStartDate")
             if (json.has("challengeTargetDays")) prefs.challengeTargetDays = json.getInt("challengeTargetDays")
-            if (json.has("detoxStreak")) prefs.detoxStreak = json.getInt("detoxStreak")
-            if (json.has("detoxStartDate")) prefs.detoxStartDate = json.getLong("detoxStartDate")
+            if (json.has("habitStreakCount")) prefs.habitStreakCount = json.getInt("habitStreakCount")
+            if (json.has("bestHabitStreak")) prefs.bestHabitStreak = json.getInt("bestHabitStreak")
+            if (json.has("habitStreakRequirement")) prefs.habitStreakRequirement = json.getInt("habitStreakRequirement")
+            if (json.has("habitHistoryJson")) prefs.habitHistoryJson = json.getString("habitHistoryJson")
             if (json.has("pickupLimit")) prefs.pickupLimit = json.getInt("pickupLimit")
             if (json.has("pickupSlapEnabled")) prefs.pickupSlapEnabled = json.getBoolean("pickupSlapEnabled")
             if (json.has("distractingApps")) {

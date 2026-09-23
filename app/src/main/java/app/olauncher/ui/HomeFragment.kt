@@ -504,12 +504,12 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         }
         DisciplineManager.checkDateRollover(requireContext())
         val currentDay = DisciplineManager.getCurrentChallengeDay(requireContext())
-        val detoxStreak = prefs.detoxStreak
+        val streak = DisciplineManager.getCurrentStreak(requireContext())
         val tasks = DisciplineManager.getDailyTasks(requireContext())
         val completedCount = tasks.count { it.isCompleted }
 
         binding.tvDisciplineBanner.visibility = View.VISIBLE
-        binding.tvDisciplineBanner.text = "Day $currentDay/${prefs.challengeTargetDays} • Detox $detoxStreak\uD83D\uDD25 • Tasks $completedCount/${tasks.size}"
+        binding.tvDisciplineBanner.text = "Day $currentDay/${prefs.challengeTargetDays} • 🔥 $streak Streak • $completedCount/${tasks.size} Tasks"
 
         val progress = DisciplineManager.getChallengeProgressPercent(requireContext())
         binding.progressBarMicro.progress = progress
@@ -535,7 +535,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     private fun checkPickupSlap() {
         if (prefs.pickupSlapEnabled && prefs.pickupCount > prefs.pickupLimit) {
             binding.layoutPickupSlap.visibility = View.VISIBLE
-            binding.tvPickupSlapMessage.text = "You have unlocked your phone ${prefs.pickupCount} times today (Limit: ${prefs.pickupLimit}).\nPut it away and get back to your 100-Day goals!"
+            binding.tvPickupSlapMessage.text = "Daily pickup limit reached (${prefs.pickupCount}/${prefs.pickupLimit}).\nLock the phone and return to your focus."
 
             object : CountDownTimer(5000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {

@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:text="Safeguard your 100-Day Challenge and habits"
+        android:text="Safeguard your Focus Protocol and habits"
         android:textColor="?attr/primaryColorTrans80"
         android:textSize="14sp" />
 

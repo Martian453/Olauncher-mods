@@ -141,7 +141,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:gravity="center"
-                android:text="You have unlocked your phone too many times today.\nPut it away and get back to your 100-Day goals!"
+                android:text="Daily pickup limit reached.\nLock the phone and return to your focus."
                 android:textColor="#FFFFFFFF"
                 android:textSize="17sp" />
 

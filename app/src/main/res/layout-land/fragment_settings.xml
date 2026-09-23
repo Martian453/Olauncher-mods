@@ -206,7 +206,7 @@
 
             </LinearLayout>
 
-            <!-- 100-Day Discipline & Detox Card -->
+            <!-- Focus Protocol Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -221,10 +221,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginBottom="8dp"
-                    android:text="100-Day Discipline"
+                    android:text="Focus Protocol"
                     android:textColor="?attr/primaryColor" />
 
-                <!-- 100-Day Challenge -->
+                <!-- Protocol Duration -->
                 <FrameLayout
                     android:id="@+id/cardChallenge"
                     android:layout_width="match_parent"
@@ -237,7 +237,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:paddingVertical="8dp"
-                        android:text="100-Day Challenge"
+                        android:text="Protocol Duration"
                         android:textColor="?attr/primaryColor" />
 
                     <TextView
@@ -251,7 +251,7 @@
                         android:text="Day 1 of 100" />
                 </FrameLayout>
 
-                <!-- Detox Streak -->
+                <!-- Habit Streak -->
                 <FrameLayout
                     android:id="@+id/cardDetoxStreak"
                     android:layout_width="match_parent"
@@ -264,7 +264,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:paddingVertical="8dp"
-                        android:text="Detox Streak"
+                        android:text="Habit Streak"
                         android:textColor="?attr/primaryColor" />
 
                     <TextView
@@ -275,10 +275,37 @@
                         android:layout_gravity="end|bottom"
                         android:layout_marginEnd="4dp"
                         android:padding="8dp"
-                        android:text="1 Day 🔥" />
+                        android:text="0 Days 🔥" />
                 </FrameLayout>
 
-                <!-- 5 Daily Habits -->
+                <!-- Streak Requirement -->
+                <FrameLayout
+                    android:id="@+id/cardStreakRequirement"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <TextView
+                        style="@style/TextSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingVertical="8dp"
+                        android:text="Streak Requirement"
+                        android:textColor="?attr/primaryColor" />
+
+                    <TextView
+                        android:id="@+id/tvStreakRequirementSetting"
+                        style="@style/TextSmallBold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_marginEnd="4dp"
+                        android:padding="8dp"
+                        android:text="Flexible (80%)" />
+                </FrameLayout>
+
+                <!-- Daily Habits -->
                 <FrameLayout
                     android:id="@+id/cardDailyHabits"
                     android:layout_width="match_parent"
@@ -291,7 +318,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:paddingVertical="8dp"
-                        android:text="5 Daily Habits"
+                        android:text="Daily Habits"
                         android:textColor="?attr/primaryColor" />
 
                     <TextView

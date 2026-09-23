@@ -46,7 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="Take a deep breath.\nAre you opening this on autopilot?"
+            android:text="Take a pause.\nDo you intentionally need to open this now?"
             android:textColor="?attr/primaryColorTrans80"
             android:textSize="16sp" />
 
@@ -152,7 +152,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="⛔ Daily Limit Finished"
+            android:text="Daily Limit Reached"
             android:textColor="?attr/primaryColor"
             android:textSize="22sp" />
 
@@ -163,7 +163,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:gravity="center"
-            android:text="You have used all of your allotted time for this app today.\nStay committed to your 100-Day Challenge!"
+            android:text="You have used all of your allotted time for this app today.\nStay focused on your protocol."
             android:textColor="?attr/primaryColorTrans80"
             android:textSize="16sp" />
 
@@ -176,7 +176,7 @@
             android:background="@drawable/rounded_rect_shade_color"
             android:gravity="center"
             android:padding="14dp"
-            android:text="I Will Stay Strong"
+            android:text="Close App"
             android:textColor="?attr/primaryColor"
             android:textSize="18sp" />
 

@@ -30,7 +30,7 @@ object LaunchFrictionDialog {
             binding.layoutMathGate.visibility = View.GONE
             binding.layoutEmergencyForm.visibility = View.GONE
             binding.layoutHardLockout.visibility = View.VISIBLE
-            binding.tvLockoutMessage.text = "You have used your entire ${limit}m budget for $appName today.\nLock in and stay focused on your 100-Day Challenge!"
+            binding.tvLockoutMessage.text = "You have used your entire ${limit}m budget for $appName today.\nStay focused on your protocol."
             binding.btnLockoutExit.setOnClickListener { dialog.dismiss() }
             binding.btnEmergencyBypass.setOnClickListener {
                 binding.layoutHardLockout.visibility = View.GONE

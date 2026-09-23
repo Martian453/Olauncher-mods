@@ -104,7 +104,8 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
     override fun onClick(view: View) {
         when (view.id) {
             R.id.cardChallenge -> showChallengeDialog()
-            R.id.cardDetoxStreak -> showDetoxStreakDialog()
+            R.id.cardDetoxStreak -> showHabitStreakDialog()
+            R.id.cardStreakRequirement -> showStreakRequirementDialog()
             R.id.cardDailyHabits -> showConfigureHabitsDialog()
             R.id.cardPickupLimit -> showPickupLimitDialog()
             R.id.cardDistractingApps -> showDistractingAppsWithAntiCheat()
@@ -174,6 +175,7 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
     private fun initClickListeners() {
         binding.cardChallenge.setOnClickListener(this)
         binding.cardDetoxStreak.setOnClickListener(this)
+        binding.cardStreakRequirement.setOnClickListener(this)
         binding.cardDailyHabits.setOnClickListener(this)
         binding.cardPickupLimit.setOnClickListener(this)
         binding.cardDistractingApps.setOnClickListener(this)
@@ -393,11 +395,15 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
 
     private fun populateDisciplineSettings() {
         val currentDay = DisciplineManager.getCurrentChallengeDay(requireContext())
+        val streak = DisciplineManager.getCurrentStreak(requireContext())
+        val req = DisciplineManager.getStreakRequirement(requireContext())
         binding.tvChallengeDaySetting.text = "Day $currentDay of ${prefs.challengeTargetDays}"
-        binding.tvDetoxStreakSetting.text = "${prefs.detoxStreak} ${if (prefs.detoxStreak == 1) "Day" else "Days"} 🔥"
+        binding.tvDetoxStreakSetting.text = "$streak ${if (streak == 1) "Day" else "Days"} 🔥"
+        binding.tvStreakRequirementSetting.text = if (req >= 100) "Strict (100%)" else "Flexible (80%)"
         binding.tvDailyHabitsSetting.text = "Configure"
         binding.tvPickupLimitSetting.text = "${prefs.pickupLimit} Pickups"
-        binding.tvDistractingAppsSetting.text = "${prefs.distractingApps.size} Apps"
+        val appCount = prefs.distractingApps.size
+        binding.tvDistractingAppsSetting.text = "$appCount ${if (appCount == 1) "App" else "Apps"}"
         binding.tvAntiCheatSetting.text = "${prefs.antiCheatCooldownSeconds}s Cooldown"
     }
 
@@ -406,7 +412,7 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         input.inputType = android.text.InputType.TYPE_CLASS_NUMBER
         input.setText(prefs.challengeTargetDays.toString())
         AlertDialog.Builder(requireContext())
-            .setTitle("100-Day Challenge Target")
+            .setTitle("Protocol Duration")
             .setMessage("Set your goal target days (default 100):")
             .setView(input)
             .setPositiveButton(R.string.okay) { _, _ ->
@@ -425,24 +431,43 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
                 prefs.challengeStartDate = cal.timeInMillis
                 populateDisciplineSettings()
                 viewModel.refreshHome.postValue(false)
-                requireContext().showToast("Challenge reset to Day 1. You got this!")
+                requireContext().showToast("Start date reset to Day 1.")
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 
-    private fun showDetoxStreakDialog() {
+    private fun showHabitStreakDialog() {
+        val streak = DisciplineManager.getCurrentStreak(requireContext())
+        val best = DisciplineManager.getBestStreak(requireContext())
+        val req = DisciplineManager.getStreakRequirement(requireContext())
+        val reqText = if (req >= 100) "Strict (100%)" else "Flexible (80%)"
         AlertDialog.Builder(requireContext())
-            .setTitle("Detox Streak")
-            .setMessage("Current clean streak: ${prefs.detoxStreak} days 🔥\n\nStay disciplined and take it one day at a time.")
-            .setPositiveButton("Keep Going", null)
+            .setTitle("Habit Streak")
+            .setMessage("Current active streak: $streak days 🔥\nBest streak: $best days\nRequirement: $reqText")
+            .setPositiveButton(R.string.okay, null)
             .setNeutralButton("Reset Streak to 0") { _, _ ->
-                prefs.detoxStreak = 0
-                prefs.detoxStartDate = System.currentTimeMillis()
+                prefs.habitStreakCount = 0
                 populateDisciplineSettings()
                 viewModel.refreshHome.postValue(false)
-                requireContext().showToast("Streak reset. Pick yourself up and start fresh!")
+                requireContext().showToast("Streak reset to 0.")
             }
+            .show()
+    }
+
+    private fun showStreakRequirementDialog() {
+        val options = arrayOf("Flexible (At least 80% / 4 of 5 habits)", "Strict (100% required)")
+        val current = if (DisciplineManager.getStreakRequirement(requireContext()) >= 100) 1 else 0
+        AlertDialog.Builder(requireContext())
+            .setTitle("Streak Requirement")
+            .setSingleChoiceItems(options, current) { dialog, which ->
+                val newReq = if (which == 1) 100 else 80
+                DisciplineManager.setStreakRequirement(requireContext(), newReq)
+                populateDisciplineSettings()
+                viewModel.refreshHome.postValue(false)
+                dialog.dismiss()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 
@@ -454,8 +479,8 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
             setText(habits.joinToString("\n"))
         }
         AlertDialog.Builder(requireContext())
-            .setTitle("5 Default Habits")
-            .setMessage("Enter your 5 non-negotiable habits (one per line):")
+            .setTitle("Daily Habits")
+            .setMessage("Enter your daily recurring habits (one per line):")
             .setView(input)
             .setPositiveButton(R.string.okay) { _, _ ->
                 val lines = input.text.toString().split("\n")

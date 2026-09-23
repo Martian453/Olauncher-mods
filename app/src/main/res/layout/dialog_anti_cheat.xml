@@ -14,7 +14,7 @@
         style="@style/TextLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="🛡️ Anti-Cheat Lock"
+        android:text="Anti-Cheat Cooldown"
         android:textColor="?attr/primaryColor"
         android:textSize="22sp" />
 
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="Take 60 seconds to rethink this urge.\nDo not trade your 100-day goals for temporary cheap dopamine."
+        android:text="Take 60 seconds to pause and reflect before modifying your limits."
         android:textColor="?attr/primaryColorTrans80" />
 
     <!-- 60s Countdown Timer -->
@@ -44,7 +44,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:text="Type this exact pledge to proceed:"
+        android:text="Type confirmation to proceed:"
         android:textColor="?attr/primaryColorTrans80" />
 
     <TextView
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:gravity="center"
-        android:text="&quot;I am breaking my self-improvement promise&quot;"
+        android:text="&quot;I am adjusting my protocol limits&quot;"
         android:textColor="?attr/primaryColor"
         android:textStyle="italic" />
 
@@ -64,7 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:hint="Type pledge here..."
+        android:hint="Type confirmation here..."
         android:inputType="textCapSentences"
         android:textColor="?attr/primaryColor"
         android:textColorHint="?attr/primaryColorTrans50"
@@ -86,7 +86,7 @@
             android:background="@drawable/rounded_rect_shade_color"
             android:gravity="center"
             android:padding="12dp"
-            android:text="Stay Strong (Cancel)"
+            android:text="Cancel"
             android:textColor="?attr/primaryColor" />
 
         <TextView
