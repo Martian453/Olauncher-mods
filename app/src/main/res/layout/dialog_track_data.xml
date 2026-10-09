@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_home_tasks_card"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="20dp">
+
+        <!-- Top Header Row -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/geist_medium"
+                    android:letterSpacing="0.10"
+                    android:text="FOCUS PROTOCOL • TELEMETRY"
+                    android:textAllCaps="true"
+                    android:textColor="?attr/primaryColorTrans50"
+                    android:textSize="10sp" />
+
+                <TextView
+                    style="@style/TextLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/outfit"
+                    android:text="Track Data &amp; Trends"
+                    android:textColor="?attr/primaryColor"
+                    android:textSize="22sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnTrackDataClose"
+                style="@style/TextMedium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:text="✕"
+                android:textColor="?attr/primaryColorTrans50"
+                android:textSize="18sp" />
+        </FrameLayout>
+
+        <!-- CHART 1: 7-Day Habit Continuity Bars -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/rounded_rect_shade_color"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/geist_medium"
+                android:letterSpacing="0.08"
+                android:text="7-DAY HABIT CONTINUITY"
+                android:textAllCaps="true"
+                android:textColor="?attr/primaryColorTrans50"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/tvTrackContinuitySummary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/geist_mono"
+                android:textColor="?attr/primaryColor"
+                android:textSize="12sp"
+                tools:text="🔥 1 Streak • 85% Completion Avg" />
+
+            <!-- 7-Day Vertical Bar Chart Container -->
+            <LinearLayout
+                android:id="@+id/layoutHabitBars"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal" />
+        </LinearLayout>
+
+        <!-- CHART 2: Habit Stats Breakdown -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/rounded_rect_shade_color"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/geist_medium"
+                android:letterSpacing="0.08"
+                android:text="COMPLETION RATE &amp; STATS"
+                android:textAllCaps="true"
+                android:textColor="?attr/primaryColorTrans50"
+                android:textSize="10sp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/tvAvgCompletionLabel"
+                    style="@style/TextSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/geist_regular"
+                    android:text="Average Success Rate"
+                    android:textColor="?attr/primaryColorTrans80"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tvAvgCompletionValue"
+                    style="@style/TextSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:fontFamily="@font/geist_mono"
+                    android:textColor="?attr/primaryColor"
+                    android:textSize="12sp"
+                    tools:text="85%" />
+            </FrameLayout>
+
+            <ProgressBar
+                android:id="@+id/pbAvgCompletion"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:max="100"
+                android:progress="85"
+                android:progressTint="?attr/primaryColor" />
+
+            <!-- 3 Stat Pill Columns -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvCleanDaysCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/geist_mono"
+                        android:textColor="?attr/primaryColor"
+                        android:textSize="16sp"
+                        tools:text="6" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/geist_regular"
+                        android:text="Clean Days"
+                        android:textColor="?attr/primaryColorTrans50"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvMissedDaysCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/geist_mono"
+                        android:textColor="?attr/primaryColor"
+                        android:textSize="16sp"
+                        tools:text="1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/geist_regular"
+                        android:text="Missed Days"
+                        android:textColor="?attr/primaryColorTrans50"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvBestStreakCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/geist_mono"
+                        android:textColor="?attr/primaryColor"
+                        android:textSize="16sp"
+                        tools:text="7" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/geist_regular"
+                        android:text="Best Streak"
+                        android:textColor="?attr/primaryColorTrans50"
+                        android:textSize="11sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- CHART 3: Pickups & Velocity -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/rounded_rect_shade_color"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/geist_medium"
+                android:letterSpacing="0.08"
+                android:text="PHONE UNLOCK PACING &amp; BUDGET"
+                android:textAllCaps="true"
+                android:textColor="?attr/primaryColorTrans50"
+                android:textSize="10sp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:id="@+id/tvPacingStatus"
+                    style="@style/TextSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/geist_regular"
+                    android:text="1 pickup every 42m"
+                    android:textColor="?attr/primaryColorTrans80"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tvPickupProgressText"
+                    style="@style/TextSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:fontFamily="@font/geist_mono"
+                    android:textColor="?attr/primaryColor"
+                    android:textSize="12sp"
+                    tools:text="18 / 50 Pickups" />
+            </FrameLayout>
+
+            <ProgressBar
+                android:id="@+id/pbPickupsTrack"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_marginTop="4dp"
+                android:max="50"
+                android:progress="18"
+                android:progressTint="?attr/primaryColor" />
+        </LinearLayout>
+
+        <!-- CHART 4: Guarded Apps Usage Breakdown -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/rounded_rect_shade_color"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/geist_medium"
+                android:letterSpacing="0.08"
+                android:text="GUARDED APPS USAGE TODAY"
+                android:textAllCaps="true"
+                android:textColor="?attr/primaryColorTrans50"
+                android:textSize="10sp" />
+
+            <LinearLayout
+                android:id="@+id/layoutGuardedAppsList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical" />
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

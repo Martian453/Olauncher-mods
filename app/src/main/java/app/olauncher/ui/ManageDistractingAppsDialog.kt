@@ -25,11 +25,15 @@ object ManageDistractingAppsDialog {
         val binding = DialogManageDistractingAppsBinding.inflate(LayoutInflater.from(dialog.context))
         dialog.setView(binding.root)
 
+        val validDistractingApps = DisciplineManager.getValidDistractingApps(context)
         val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
         val activities = launcherApps.getActivityList(null, Process.myUserHandle())
         val appItems = activities.map {
             AppItem(it.label.toString(), it.applicationInfo.packageName)
-        }.distinctBy { it.packageName }.sortedBy { it.label.lowercase() }
+        }.distinctBy { it.packageName }.sortedWith(
+            compareByDescending<AppItem> { validDistractingApps.contains(it.packageName) }
+                .thenBy { it.label.lowercase() }
+        )
 
         val adapter = DistractingAppsAdapter(context, appItems)
         binding.rvDistractingApps.layoutManager = LinearLayoutManager(context)
@@ -64,22 +68,58 @@ object ManageDistractingAppsDialog {
             holder.binding.cbDistractingApp.isChecked = isDistracting
             holder.binding.tvLimitLabel.text = "${limitMinutes}m limit"
 
-            holder.binding.cbDistractingApp.setOnCheckedChangeListener { _, isChecked ->
-                DisciplineManager.setAppDistracting(context, item.packageName, isChecked)
+            holder.binding.cbDistractingApp.setOnClickListener {
+                val currentlyGuarded = DisciplineManager.isAppDistracting(context, item.packageName)
+                if (currentlyGuarded) {
+                    // Revert visually until confirmed
+                    holder.binding.cbDistractingApp.isChecked = true
+                    AlertDialog.Builder(context)
+                        .setTitle("⚠️ Protocol Warning")
+                        .setMessage("Removing \"${item.label}\" weakens your focus barrier.\n\nPenalty: Breaking this discipline commitment will immediately reset your focus streak to 0.\n\nAre you sure you want to proceed?")
+                        .setPositiveButton("Proceed & Reset Streak") { _, _ ->
+                            DisciplineManager.setAppDistracting(context, item.packageName, false)
+                            val prefs = Prefs(context)
+                            prefs.habitStreakCount = 0
+                            prefs.manualStreakUpdatedDate = ""
+                            notifyItemChanged(position)
+                        }
+                        .setNegativeButton("Cancel (Keep Guarded)", null)
+                        .show()
+                } else {
+                    DisciplineManager.setAppDistracting(context, item.packageName, true)
+                    notifyItemChanged(position)
+                }
+            }
+
+            holder.binding.tvDistractingAppName.setOnClickListener {
+                holder.binding.cbDistractingApp.performClick()
             }
 
             holder.binding.tvLimitLabel.setOnClickListener {
-                val input = EditText(context)
-                input.inputType = android.text.InputType.TYPE_CLASS_NUMBER
-                input.setText(limitMinutes.toString())
+                val durations = arrayOf("15 mins", "30 mins (Recommended)", "45 mins", "60 mins", "Custom...")
+                val values = arrayOf(15, 30, 45, 60)
                 AlertDialog.Builder(context)
-                    .setTitle("Daily Limit (minutes)")
-                    .setMessage("Set maximum daily minutes for ${item.label}:")
-                    .setView(input)
-                    .setPositiveButton(R.string.okay) { _, _ ->
-                        val mins = input.text.toString().toIntOrNull() ?: 30
-                        DisciplineManager.setAppDailyLimitMinutes(context, item.packageName, mins.coerceAtLeast(5))
-                        notifyItemChanged(position)
+                    .setTitle("Daily Limit for ${item.label}")
+                    .setItems(durations) { _, which ->
+                        if (which < values.size) {
+                            DisciplineManager.setAppDailyLimitMinutes(context, item.packageName, values[which])
+                            notifyItemChanged(position)
+                        } else {
+                            val input = EditText(context).apply {
+                                inputType = android.text.InputType.TYPE_CLASS_NUMBER
+                                setText(limitMinutes.toString())
+                            }
+                            AlertDialog.Builder(context)
+                                .setTitle("Custom Daily Limit (minutes)")
+                                .setView(input)
+                                .setPositiveButton(R.string.okay) { _, _ ->
+                                    val mins = input.text.toString().toIntOrNull() ?: 30
+                                    DisciplineManager.setAppDailyLimitMinutes(context, item.packageName, mins.coerceAtLeast(5))
+                                    notifyItemChanged(position)
+                                }
+                                .setNegativeButton(android.R.string.cancel, null)
+                                .show()
+                        }
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .show()

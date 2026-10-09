@@ -1,22 +1,27 @@
 package app.olauncher.ui
 
 import android.content.Context
-import android.graphics.Paint
+import android.view.Gravity
 import android.view.LayoutInflater
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
+import app.olauncher.R
 import app.olauncher.data.Prefs
 import app.olauncher.databinding.DialogCommandCenterBinding
-import app.olauncher.databinding.ItemDailyTaskBinding
-import app.olauncher.databinding.ItemWeekDayBinding
+import app.olauncher.databinding.ItemMilestoneChipBinding
 import app.olauncher.helper.DisciplineManager
 import app.olauncher.helper.OlDialog
+import app.olauncher.helper.dpToPx
+import app.olauncher.helper.getColorFromAttr
 
 object CommandCenterDialog {
 
     fun show(
         context: Context,
         screenTimeString: String,
-        onTasksUpdated: () -> Unit,
-        onEveningCheckinRequested: () -> Unit
+        onTasksUpdated: (() -> Unit)? = null,
+        onEveningCheckinRequested: (() -> Unit)? = null
     ) {
         val prefs = Prefs(context)
         val dialog = OlDialog(context)
@@ -24,91 +29,129 @@ object CommandCenterDialog {
         dialog.setView(binding.root)
 
         val currentDay = DisciplineManager.getCurrentChallengeDay(context)
-        val daysRemaining = DisciplineManager.getDaysRemaining(context)
-        val progress = DisciplineManager.getChallengeProgressPercent(context)
 
-        binding.tvChallengeDay.text = "Day $currentDay of ${prefs.challengeTargetDays}"
-        binding.tvDaysRemaining.text = "$daysRemaining Days Left"
-        binding.pbChallenge.progress = progress
+        // 1. Knight Mastery Level & Rank
+        val rank = DisciplineManager.getKnightRank(context)
+        binding.tvRankTitle.text = "⚔️ Level ${rank.level} • ${rank.title}"
+        binding.pbRankProgress.progress = rank.progressPercent
+        binding.tvRankSubtitle.text = "Day $currentDay/${prefs.challengeTargetDays} • ${rank.currentXp} XP • ${rank.nextTierTitle}"
 
-        val st = if (screenTimeString.isNotBlank()) screenTimeString else "0m"
-        binding.tvPickupsCount.text = "📱 ${prefs.pickupCount} / ${prefs.pickupLimit} Pickups"
-        binding.tvScreenTimeStats.text = "⏳ $st Screen Time"
+        // 2. Daily Discipline Score (0 – 1000 Pts)
+        val score = DisciplineManager.calculateDisciplineScore(context, screenTimeString)
+        binding.tvScoreNumber.text = score.totalScore.toString()
+        binding.tvScoreTierBadge.text = "${score.tierGrade} • ${score.tierTitle}"
 
-        fun updateStatsAndHistory() {
-            val streak = DisciplineManager.getCurrentStreak(context)
-            val best = DisciplineManager.getBestStreak(context)
-            val consistency = DisciplineManager.getOverallConsistencyPercent(context)
-            binding.tvStreakHeader.text = "🔥 $streak Streak  •  Best: $best  •  $consistency% Rate"
+        binding.tvScoreHabitsValue.text = "${score.habitPoints} / 500 pts"
+        binding.pbScoreHabits.progress = score.habitPoints
 
-            binding.layoutWeekStrip.removeAllViews()
-            val history = DisciplineManager.getRecentHistory(context, 7)
-            val inflater = LayoutInflater.from(context)
+        binding.tvScoreScreenTimeValue.text = "${score.screenTimePoints} / 250 pts"
+        binding.pbScoreScreenTime.progress = score.screenTimePoints
 
-            history.forEach { day ->
-                val dayBinding = ItemWeekDayBinding.inflate(inflater, binding.layoutWeekStrip, false)
-                dayBinding.tvWeekDayLabel.text = day.label
+        binding.tvScorePickupsValue.text = "${score.pickupPoints} / 250 pts"
+        binding.pbScorePickups.progress = score.pickupPoints
 
-                if (day.isToday) {
-                    if (day.success) {
-                        dayBinding.tvWeekDayIndicator.text = "●"
-                        dayBinding.tvWeekDayIndicator.alpha = 1.0f
+        // 3. 28-Day Consistency Matrix (GitHub-style Heatmap)
+        val consistency = DisciplineManager.getOverallConsistencyPercent(context)
+        val streak = DisciplineManager.getCurrentStreak(context)
+        val best = DisciplineManager.getBestStreak(context)
+        binding.tvMatrixSummary.text = "$consistency% Continuity • Best: $best Days • 🔥 $streak Streak"
+
+        val monthlyDays = DisciplineManager.getMonthlyMatrix(context)
+        val matrixWeeks = monthlyDays.chunked(7)
+        binding.layoutMatrixGrid.removeAllViews()
+
+        val geistMonoFont = ResourcesCompat.getFont(context, R.font.geist_mono)
+        val primaryColor = context.getColorFromAttr(R.attr.primaryColor)
+        val primaryTrans80 = context.getColorFromAttr(R.attr.primaryColorTrans80)
+        val primaryTrans50 = context.getColorFromAttr(R.attr.primaryColorTrans50)
+
+        matrixWeeks.forEach { week ->
+            val rowLayout = LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    topMargin = 4.dpToPx()
+                    bottomMargin = 4.dpToPx()
+                }
+            }
+
+            week.forEach { day ->
+                val dayTv = TextView(context).apply {
+                    layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                    gravity = Gravity.CENTER
+                    textSize = 14f
+                    typeface = geistMonoFont
+
+                    if (day.isToday) {
+                        text = "●"
+                        setTextColor(primaryColor)
+                        alpha = 1.0f
+                    } else if (day.isFuture) {
+                        text = "·"
+                        setTextColor(primaryTrans50)
+                        alpha = 0.25f
+                    } else if (day.success) {
+                        text = "■"
+                        setTextColor(primaryColor)
+                        alpha = 0.95f
+                    } else if (day.completed > 0) {
+                        text = "⬝"
+                        setTextColor(primaryTrans80)
+                        alpha = 0.7f
                     } else {
-                        dayBinding.tvWeekDayIndicator.text = "◐"
-                        dayBinding.tvWeekDayIndicator.alpha = 0.8f
+                        text = "○"
+                        setTextColor(primaryTrans50)
+                        alpha = 0.35f
                     }
-                    dayBinding.tvWeekDayLabel.alpha = 1.0f
-                } else if (day.success) {
-                    dayBinding.tvWeekDayIndicator.text = "●"
-                    dayBinding.tvWeekDayIndicator.alpha = 0.9f
-                } else {
-                    dayBinding.tvWeekDayIndicator.text = "○"
-                    dayBinding.tvWeekDayIndicator.alpha = 0.35f
                 }
+                rowLayout.addView(dayTv)
+            }
+            binding.layoutMatrixGrid.addView(rowLayout)
+        }
 
-                binding.layoutWeekStrip.addView(dayBinding.root)
+        // 4. Milestones & Honors (Achieved Only Ribbon)
+        val milestones = DisciplineManager.getMilestones(context)
+        binding.layoutMilestonesContainer.removeAllViews()
+        val inflater = LayoutInflater.from(context)
+
+        val earnedMilestones = milestones.filter { it.isUnlocked }
+        if (earnedMilestones.isEmpty()) {
+            val emptyTv = android.widget.TextView(context).apply {
+                text = "No honors earned yet. Complete daily habits & streaks to unlock."
+                setTextColor(primaryTrans50)
+                textSize = 12f
+                typeface = binding.tvRankTitle.typeface
+                setPadding(0, 4.dpToPx(), 0, 4.dpToPx())
+            }
+            binding.layoutMilestonesContainer.addView(emptyTv)
+        } else {
+            val milestoneRows = earnedMilestones.chunked(2)
+            milestoneRows.forEach { rowItems ->
+                val rowLayout = LinearLayout(context).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        bottomMargin = 6.dpToPx()
+                    }
+                }
+                rowItems.forEach { m ->
+                    val chipBinding = ItemMilestoneChipBinding.inflate(inflater, rowLayout, false)
+                    chipBinding.tvMilestoneChip.text = "${m.icon} ${m.title}"
+                    chipBinding.tvMilestoneChip.alpha = 1.0f
+                    chipBinding.tvMilestoneChip.setTextColor(primaryColor)
+                    rowLayout.addView(chipBinding.root)
+                }
+                binding.layoutMilestonesContainer.addView(rowLayout)
             }
         }
 
-        fun renderTasks() {
-            binding.layoutTasksContainer.removeAllViews()
-            val tasks = DisciplineManager.getDailyTasks(context)
-            val inflater = LayoutInflater.from(context)
-
-            tasks.forEach { task ->
-                val itemBinding = ItemDailyTaskBinding.inflate(inflater, binding.layoutTasksContainer, false)
-                itemBinding.cbTask.isChecked = task.isCompleted
-                itemBinding.tvTaskTitle.text = "${task.id}. ${task.title}"
-
-                if (task.isCompleted) {
-                    itemBinding.tvTaskTitle.paintFlags = itemBinding.tvTaskTitle.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-                    itemBinding.tvTaskTitle.alpha = 0.5f
-                } else {
-                    itemBinding.tvTaskTitle.paintFlags = itemBinding.tvTaskTitle.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-                    itemBinding.tvTaskTitle.alpha = 1.0f
-                }
-
-                itemBinding.layoutTaskItem.setOnClickListener {
-                    DisciplineManager.toggleTask(context, task.id)
-                    renderTasks()
-                    updateStatsAndHistory()
-                    onTasksUpdated()
-                }
-
-                binding.layoutTasksContainer.addView(itemBinding.root)
-            }
-        }
-
-        updateStatsAndHistory()
-        renderTasks()
-
+        // 5. Action Triggers
         binding.ivCloseCommandCenter.setOnClickListener {
             dialog.dismiss()
-        }
-
-        binding.btnEveningCheckin.setOnClickListener {
-            dialog.dismiss()
-            onEveningCheckinRequested()
         }
 
         dialog.showRespectingStatusBar()

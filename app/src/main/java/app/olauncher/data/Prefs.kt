@@ -778,4 +778,75 @@ class Prefs(context: Context) {
     var habitHistoryJson: String
         get() = prefs.getString(HABIT_HISTORY_JSON, "").toString()
         set(value) = prefs.edit { putString(HABIT_HISTORY_JSON, value).apply() }
+
+    // --- Streak Freeze Shield (Option B: Manual, max 3 per month) ---
+    private val STREAK_FREEZES_MONTH = "STREAK_FREEZES_MONTH"
+    private val STREAK_FREEZES_USED_THIS_MONTH = "STREAK_FREEZES_USED_THIS_MONTH"
+    private val STREAK_FREEZE_ACTIVE_DATE = "STREAK_FREEZE_ACTIVE_DATE"
+
+    var streakFreezesMonth: String
+        get() = prefs.getString(STREAK_FREEZES_MONTH, "").toString()
+        set(value) = prefs.edit { putString(STREAK_FREEZES_MONTH, value).apply() }
+
+    var streakFreezesUsedThisMonth: Int
+        get() = prefs.getInt(STREAK_FREEZES_USED_THIS_MONTH, 0)
+        set(value) = prefs.edit { putInt(STREAK_FREEZES_USED_THIS_MONTH, value).apply() }
+
+    var streakFreezeActiveDate: String
+        get() = prefs.getString(STREAK_FREEZE_ACTIVE_DATE, "").toString()
+        set(value) = prefs.edit { putString(STREAK_FREEZE_ACTIVE_DATE, value).apply() }
+
+    // --- "THE KNIGHT" Navigation & Progressive Friction Gate ---
+    private val BOTTOM_HUD_ENABLED = "BOTTOM_HUD_ENABLED"
+    private val HIDDEN_APPS_ACCESS_COUNT_TODAY = "HIDDEN_APPS_ACCESS_COUNT_TODAY"
+    private val LAST_HIDDEN_APPS_ACCESS_DATE = "LAST_HIDDEN_APPS_ACCESS_DATE"
+    private val DISTRACTING_APPS_LAUNCH_COUNT_TODAY = "DISTRACTING_APPS_LAUNCH_COUNT_TODAY"
+    private val LAST_DISTRACTING_APPS_DATE = "LAST_DISTRACTING_APPS_DATE"
+    private val MANUAL_STREAK_UPDATED_DATE = "MANUAL_STREAK_UPDATED_DATE"
+    private val UNLOCKED_BADGES_JSON = "UNLOCKED_BADGES_JSON"
+    private val CELEBRATED_BADGES_JSON = "CELEBRATED_BADGES_JSON"
+
+    var bottomHudEnabled: Boolean
+        get() = prefs.getBoolean(BOTTOM_HUD_ENABLED, true)
+        set(value) = prefs.edit { putBoolean(BOTTOM_HUD_ENABLED, value).apply() }
+
+    var hiddenAppsAccessCountToday: Int
+        get() = prefs.getInt(HIDDEN_APPS_ACCESS_COUNT_TODAY, 0)
+        set(value) = prefs.edit { putInt(HIDDEN_APPS_ACCESS_COUNT_TODAY, value).apply() }
+
+    var lastHiddenAppsAccessDate: String
+        get() = prefs.getString(LAST_HIDDEN_APPS_ACCESS_DATE, "").toString()
+        set(value) = prefs.edit { putString(LAST_HIDDEN_APPS_ACCESS_DATE, value).apply() }
+
+    var distractingAppsLaunchCountToday: Int
+        get() = prefs.getInt(DISTRACTING_APPS_LAUNCH_COUNT_TODAY, 0)
+        set(value) = prefs.edit { putInt(DISTRACTING_APPS_LAUNCH_COUNT_TODAY, value).apply() }
+
+    var lastDistractingAppsDate: String
+        get() = prefs.getString(LAST_DISTRACTING_APPS_DATE, "").toString()
+        set(value) = prefs.edit { putString(LAST_DISTRACTING_APPS_DATE, value).apply() }
+
+    var manualStreakUpdatedDate: String
+        get() = prefs.getString(MANUAL_STREAK_UPDATED_DATE, "").toString()
+        set(value) = prefs.edit { putString(MANUAL_STREAK_UPDATED_DATE, value).apply() }
+
+    private val HABITS_AUTO_CREDITED_DATE = "HABITS_AUTO_CREDITED_DATE"
+
+    var habitsAutoCreditedDate: String
+        get() = prefs.getString(HABITS_AUTO_CREDITED_DATE, "").toString()
+        set(value) = prefs.edit { putString(HABITS_AUTO_CREDITED_DATE, value).apply() }
+
+    var unlockedBadgesJson: String
+        get() = prefs.getString(UNLOCKED_BADGES_JSON, "[]").toString()
+        set(value) = prefs.edit { putString(UNLOCKED_BADGES_JSON, value).apply() }
+
+    var celebratedBadgesJson: String
+        get() = prefs.getString(CELEBRATED_BADGES_JSON, "[]").toString()
+        set(value) = prefs.edit { putString(CELEBRATED_BADGES_JSON, value).apply() }
+
+    private val PENDING_TOMORROW_TASKS_JSON = "PENDING_TOMORROW_TASKS_JSON"
+
+    var pendingTomorrowTasksJson: String
+        get() = prefs.getString(PENDING_TOMORROW_TASKS_JSON, "").toString()
+        set(value) = prefs.edit { putString(PENDING_TOMORROW_TASKS_JSON, value).apply() }
 }

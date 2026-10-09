@@ -52,39 +52,6 @@
                         android:padding="4dp"
                         android:src="@drawable/ic_info" />
                 </FrameLayout>
-
-                <TextView
-                    android:id="@+id/setLauncher"
-                    style="@style/TextSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="@string/set_as_default_launcher" />
-
-                <TextView
-                    android:id="@+id/aboutOlauncher"
-                    style="@style/TextSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="8dp"
-                    android:drawablePadding="8dp"
-                    android:gravity="center"
-                    android:text="@string/about_olauncher" />
-
-                <TextView
-                    android:id="@+id/moreFeatures"
-                    style="@style/TextSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="@string/more_features" />
-
             </LinearLayout>
 
             <LinearLayout
@@ -359,7 +326,7 @@
                         android:text="50 Pickups" />
                 </FrameLayout>
 
-                <!-- Distracting Apps & Limits -->
+                <!-- Distracting Apps -->
                 <FrameLayout
                     android:id="@+id/cardDistractingApps"
                     android:layout_width="match_parent"
@@ -372,7 +339,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:paddingVertical="8dp"
-                        android:text="Distracting Apps &amp; Limits"
+                        android:text="Distracting Apps"
                         android:textColor="?attr/primaryColor" />
 
                     <TextView
@@ -383,12 +350,12 @@
                         android:layout_gravity="end|bottom"
                         android:layout_marginEnd="4dp"
                         android:padding="8dp"
-                        android:text="Manage" />
+                        android:text="0 Apps" />
                 </FrameLayout>
 
-                <!-- Anti-Cheat Lock -->
+                <!-- Track Data -->
                 <FrameLayout
-                    android:id="@+id/cardAntiCheat"
+                    android:id="@+id/cardTrackData"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp">
@@ -399,18 +366,18 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:paddingVertical="8dp"
-                        android:text="Anti-Cheat Lock"
+                        android:text="Track data"
                         android:textColor="?attr/primaryColor" />
 
                     <TextView
-                        android:id="@+id/tvAntiCheatSetting"
+                        android:id="@+id/tvTrackDataSetting"
                         style="@style/TextSmallBold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end|bottom"
                         android:layout_marginEnd="4dp"
                         android:padding="8dp"
-                        android:text="60s Cooldown" />
+                        android:text="Charts &amp; Trends →" />
                 </FrameLayout>
 
                 <!-- Backup & Restore -->
@@ -486,28 +453,55 @@
                 </FrameLayout>
 
                 <FrameLayout
+                    android:id="@+id/cardWallpaperGallery"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp">
 
                     <TextView
-                        android:id="@+id/dailyWallpaperUrl"
                         style="@style/TextSmall"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:paddingVertical="8dp"
-                        android:text="@string/daily_wallpaper_update" />
+                        android:text="Wallpaper"
+                        android:textColor="?attr/primaryColor" />
 
                     <TextView
-                        android:id="@+id/dailyWallpaper"
+                        android:id="@+id/tvWallpaperGallery"
                         style="@style/TextSmallBold"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end|bottom"
                         android:layout_marginEnd="4dp"
                         android:padding="8dp"
-                        android:text="@string/off" />
+                        android:text="Choose from Gallery" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/cardBottomHud"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <TextView
+                        style="@style/TextSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingVertical="8dp"
+                        android:text="Bottom HUD Navigation"
+                        android:textColor="?attr/primaryColor" />
+
+                    <TextView
+                        android:id="@+id/tvBottomHudSetting"
+                        style="@style/TextSmallBold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end|bottom"
+                        android:layout_marginEnd="4dp"
+                        android:padding="8dp"
+                        android:text="On" />
                 </FrameLayout>
 
                 <FrameLayout
@@ -743,70 +737,37 @@
                 -->
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/privacy"
-                    style="@style/TextSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="8dp"
-                    android:padding="10dp"
-                    android:text="@string/privacy" />
-
-                <TextView
-                    android:id="@+id/share"
-                    style="@style/TextSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="8dp"
-                    android:padding="10dp"
-                    android:text="@string/share" />
-
-                <TextView
-                    android:id="@+id/rate"
-                    style="@style/TextSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="8dp"
-                    android:padding="10dp"
-                    android:text="@string/rate" />
-
-                <TextView
-                    android:id="@+id/github"
-                    style="@style/TextSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="8dp"
-                    android:padding="10dp"
-                    android:text="@string/github" />
-
-                <TextView
-                    android:id="@+id/twitter"
-                    style="@style/TextSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="8dp"
-                    android:padding="10dp"
-                    android:text="@string/x_twitter" />
-
-            </LinearLayout>
-
             <TextView
                 android:id="@+id/footer"
-                style="@style/TextSmallBold"
-                android:layout_width="wrap_content"
+                style="@style/TextSmall"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="28dp"
                 android:gravity="center"
-                android:letterSpacing="0.03"
-                android:padding="12dp"
-                android:text="@string/new_app_note_safe" />
+                android:letterSpacing="0.05"
+                android:padding="16dp"
+                android:text="THE KNIGHT • v1.0"
+                android:textColor="?attr/primaryColorTrans50" />
+
+            <LinearLayout
+                android:id="@+id/layoutHiddenDefaultLauncher"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/setLauncher"
+                    style="@style/TextSmallBold"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_rect_shade_color"
+                    android:paddingHorizontal="24dp"
+                    android:paddingVertical="12dp"
+                    android:text="@string/change_default_launcher" />
+            </LinearLayout>
 
         </LinearLayout>
 

@@ -1,9 +1,9 @@
 package app.olauncher.ui
 
 import android.content.Context
-import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
+import app.olauncher.data.Prefs
 import app.olauncher.databinding.DialogLaunchFrictionBinding
 import app.olauncher.helper.DisciplineManager
 import app.olauncher.helper.OlDialog
@@ -17,6 +17,7 @@ object LaunchFrictionDialog {
         packageName: String,
         onProceedLaunch: () -> Unit
     ) {
+        DisciplineManager.checkDateRollover(context)
         val dialog = OlDialog(context)
         val binding = DialogLaunchFrictionBinding.inflate(LayoutInflater.from(dialog.context))
         dialog.setView(binding.root)
@@ -26,17 +27,25 @@ object LaunchFrictionDialog {
         // Check if app has exceeded daily limit
         if (DisciplineManager.isAppLockedOut(context, packageName)) {
             val limit = DisciplineManager.getAppDailyLimitMinutes(context, packageName)
-            binding.layoutBreathingCountdown.visibility = View.GONE
-            binding.layoutMathGate.visibility = View.GONE
+            val canBypass = DisciplineManager.canGrantEmergencyPass(context)
+            binding.layoutFocusNotice.visibility = View.GONE
             binding.layoutEmergencyForm.visibility = View.GONE
             binding.layoutHardLockout.visibility = View.VISIBLE
-            binding.tvLockoutMessage.text = "You have used your entire ${limit}m budget for $appName today.\nStay focused on your protocol."
-            binding.btnLockoutExit.setOnClickListener { dialog.dismiss() }
-            binding.btnEmergencyBypass.setOnClickListener {
-                binding.layoutHardLockout.visibility = View.GONE
-                binding.layoutEmergencyForm.visibility = View.VISIBLE
-                binding.etEmergencyReason.requestFocus()
+
+            if (canBypass) {
+                binding.btnEmergencyBypass.visibility = View.VISIBLE
+                binding.tvLockoutMessage.text = "You have used your entire ${limit}m budget for $appName today.\nStay focused on your protocol."
+                binding.btnEmergencyBypass.setOnClickListener {
+                    binding.layoutHardLockout.visibility = View.GONE
+                    binding.layoutEmergencyForm.visibility = View.VISIBLE
+                    binding.etEmergencyReason.requestFocus()
+                }
+            } else {
+                binding.btnEmergencyBypass.visibility = View.GONE
+                binding.tvLockoutMessage.text = "You have used your entire ${limit}m budget for $appName today.\n\nEmergency bypass already exhausted for today. Access locked until tomorrow."
             }
+
+            binding.btnLockoutExit.setOnClickListener { dialog.dismiss() }
             binding.btnCancelEmergency.setOnClickListener {
                 binding.layoutEmergencyForm.visibility = View.GONE
                 binding.layoutHardLockout.visibility = View.VISIBLE
@@ -46,65 +55,51 @@ object LaunchFrictionDialog {
                 if (reason.length < 10) {
                     context.showToast("Please state a genuine reason (min 10 characters)")
                 } else {
-                    DisciplineManager.grantEmergencyPass(context, packageName)
-                    context.showToast("5-minute emergency pass granted. Make it count!")
-                    dialog.dismiss()
-                    onProceedLaunch()
+                    val granted = DisciplineManager.grantEmergencyPass(context, packageName)
+                    if (granted) {
+                        context.showToast("5-minute emergency pass granted. Make it count!")
+                        dialog.dismiss()
+                        onProceedLaunch()
+                    } else {
+                        context.showToast("Emergency bypass limit reached for today.")
+                        dialog.dismiss()
+                    }
                 }
             }
             dialog.showRespectingStatusBar()
             return
         }
 
-        // Start 10s breathing countdown
-        binding.layoutBreathingCountdown.visibility = View.VISIBLE
-        binding.layoutMathGate.visibility = View.GONE
+        // App is within budget: show clean Protocol Notice (no wait timer, immediate conscious choice)
+        val limit = DisciplineManager.getAppDailyLimitMinutes(context, packageName)
+        val used = DisciplineManager.getAppUsageTodayMinutes(context, packageName).toInt()
+        val remaining = (limit - used).coerceAtLeast(0)
+
         binding.layoutHardLockout.visibility = View.GONE
         binding.layoutEmergencyForm.visibility = View.GONE
+        binding.layoutFocusNotice.visibility = View.VISIBLE
 
-        var timer: CountDownTimer? = null
-        val num1 = (14..48).random()
-        val num2 = (13..49).random()
-        val expectedAnswer = num1 + num2
+        binding.tvAllowanceNotice.text = "${remaining}m Remaining Today"
+        binding.tvAllowanceDetail.text = "${used}m used of ${limit}m daily allowance"
+        binding.progressAllowance.progress = if (limit > 0) {
+            ((used.toFloat() / limit) * 100).toInt().coerceIn(0, 100)
+        } else {
+            0
+        }
 
-        timer = object : CountDownTimer(10000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                val seconds = (millisUntilFinished / 1000) + 1
-                binding.tvCountdownSeconds.text = seconds.toString()
-            }
-
-            override fun onFinish() {
-                binding.layoutBreathingCountdown.visibility = View.GONE
-                binding.layoutMathGate.visibility = View.VISIBLE
-                binding.tvMathProblem.text = "$num1 + $num2 = ?"
-                binding.etMathAnswer.requestFocus()
-            }
-        }.start()
-
-        binding.btnPutPhoneDown.setOnClickListener {
-            timer.cancel()
+        binding.btnReturnToFocus.setOnClickListener {
             dialog.dismiss()
         }
 
-        binding.btnCancelGate.setOnClickListener {
+        binding.btnProceedLaunch.text = "Open App (${remaining}m Left)"
+        binding.btnProceedLaunch.setOnClickListener {
+            val prefs = Prefs(context)
+            prefs.distractingAppsLaunchCountToday += 1
             dialog.dismiss()
-        }
-
-        binding.btnUnlockApp.setOnClickListener {
-            val userInput = binding.etMathAnswer.text.toString().trim()
-            if (userInput == expectedAnswer.toString()) {
-                dialog.dismiss()
-                onProceedLaunch()
-            } else {
-                context.showToast("Incorrect answer. Take a moment to reflect!")
-                binding.etMathAnswer.text.clear()
-            }
-        }
-
-        dialog.setOnDismissListener {
-            timer.cancel()
+            onProceedLaunch()
         }
 
         dialog.showRespectingStatusBar()
     }
 }
+

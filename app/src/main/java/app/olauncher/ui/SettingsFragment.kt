@@ -15,6 +15,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.bundleOf
@@ -26,6 +28,7 @@ import app.olauncher.R
 import app.olauncher.data.Constants
 import app.olauncher.data.Prefs
 import app.olauncher.helper.DisciplineManager
+import app.olauncher.databinding.DialogConfigureHabitsBinding
 import app.olauncher.databinding.DialogTextSizeBinding
 import app.olauncher.databinding.FragmentSettingsBinding
 import app.olauncher.helper.appUsagePermissionGranted
@@ -78,13 +81,13 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         checkAdminPermission()
 
         binding.homeAppsNum.text = prefs.homeAppsNum.toString()
-        populateProMessage()
         populateKeyboardText()
         populateScreenTimeOnOff()
         populateLockSettings()
         // Home button for recents feature disabled
         // populateHomeButtonRecents()
-        populateWallpaperText()
+        populateWallpaperGallery()
+        populateBottomHudSetting()
         populateAppThemeText()
         populateTextSize()
         populateBoldFont()
@@ -92,14 +95,12 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         populateStatusBar()
         populateDateTime()
         populateSwipeApps()
-        populateActionHints()
         populateDisciplineSettings()
         initClickListeners()
         initObservers()
-
-        if (showPentastic)
-            binding.footer.text = getText(R.string.new_app_minimal_todo_lists)
     }
+
+    private var footerTapCount = 0
 
     override fun onClick(view: View) {
         when (view.id) {
@@ -108,49 +109,38 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
             R.id.cardStreakRequirement -> showStreakRequirementDialog()
             R.id.cardDailyHabits -> showConfigureHabitsDialog()
             R.id.cardPickupLimit -> showPickupLimitDialog()
-            R.id.cardDistractingApps -> showDistractingAppsWithAntiCheat()
-            R.id.cardAntiCheat -> showAntiCheatSettingsDialog()
+            R.id.cardDistractingApps -> {
+                ManageDistractingAppsDialog.show(requireContext()) {
+                    populateDisciplineSettings()
+                    viewModel.getAppList()
+                    viewModel.refreshHome.postValue(false)
+                }
+            }
+            R.id.cardTrackData -> TrackDataDialog.show(requireContext())
             R.id.cardBackupRestore -> showBackupRestoreDialog()
             R.id.olauncherHiddenApps -> showHiddenApps()
-            R.id.moreFeatures -> viewModel.showDialog.postValue(Constants.Dialog.PRO_MESSAGE)
             R.id.screenTimeOnOff -> viewModel.showDialog.postValue(Constants.Dialog.DIGITAL_WELLBEING)
             R.id.appInfo -> openAppInfo(requireContext(), Process.myUserHandle(), BuildConfig.APPLICATION_ID)
             R.id.setLauncher -> viewModel.resetLauncherLiveData.call()
             R.id.toggleLock -> toggleLockMode()
-            // Home button for recents feature disabled
-            // R.id.homeButtonRecents -> toggleHomeButtonRecents()
             R.id.autoShowKeyboard -> toggleKeyboardText()
             R.id.homeAppsNum -> showHomeAppsNumMenu(view)
-            R.id.dailyWallpaperUrl -> requireContext().openUrl(prefs.dailyWallpaperUrl)
-            R.id.dailyWallpaper -> toggleDailyWallpaperUpdate()
+            R.id.cardWallpaperGallery -> openGalleryWallpaper()
+            R.id.cardBottomHud -> toggleBottomHud()
             R.id.alignment -> showAlignmentMenu(view)
             R.id.statusBar -> toggleStatusBar()
             R.id.dateTime -> showDateTimeMenu(view)
             R.id.appThemeText -> showAppThemeMenu(view, showSystem = false)
             R.id.textSizeValue -> showTextSizeDialog()
             R.id.boldFont -> toggleBoldFont()
-
             R.id.swipeLeftApp -> showAppListIfEnabled(Constants.FLAG_SET_SWIPE_LEFT_APP)
             R.id.swipeRightApp -> showAppListIfEnabled(Constants.FLAG_SET_SWIPE_RIGHT_APP)
-
-            R.id.aboutOlauncher -> {
-                prefs.aboutClicked = true
-                requireContext().openUrl(Constants.URL_ABOUT_OLAUNCHER)
-            }
-
-            R.id.share -> requireActivity().shareApp()
-            R.id.rate -> {
-                prefs.rateClicked = true
-                requireActivity().rateApp()
-            }
-
-            R.id.twitter -> requireContext().openUrl(Constants.URL_TWITTER_TANUJ)
-            R.id.github -> requireContext().openUrl(Constants.URL_OLAUNCHER_GITHUB)
-            R.id.privacy -> requireContext().openUrl(Constants.URL_OLAUNCHER_PRIVACY)
             R.id.footer -> {
-                requireContext().openUrl(
-                    if (showPentastic) Constants.URL_PENTASTIC else Constants.URL_NTS
-                )
+                footerTapCount++
+                if (footerTapCount >= 5) {
+                    binding.layoutHiddenDefaultLauncher.visibility = View.VISIBLE
+                    requireContext().showToast("Default launcher settings unlocked.")
+                }
             }
         }
     }
@@ -163,7 +153,6 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
                 requireContext().showToast(getString(R.string.alignment_changed))
             }
 
-            R.id.dailyWallpaper -> removeWallpaper()
             R.id.appThemeText -> showAppThemeMenu(view, showSystem = true)
             R.id.swipeLeftApp -> toggleSwipeLeft()
             R.id.swipeRightApp -> toggleSwipeRight()
@@ -179,21 +168,17 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         binding.cardDailyHabits.setOnClickListener(this)
         binding.cardPickupLimit.setOnClickListener(this)
         binding.cardDistractingApps.setOnClickListener(this)
-        binding.cardAntiCheat.setOnClickListener(this)
+        binding.cardTrackData.setOnClickListener(this)
         binding.cardBackupRestore.setOnClickListener(this)
         binding.olauncherHiddenApps.setOnClickListener(this)
         binding.appInfo.setOnClickListener(this)
         binding.setLauncher.setOnClickListener(this)
-        binding.aboutOlauncher.setOnClickListener(this)
-        binding.moreFeatures.setOnClickListener(this)
         binding.autoShowKeyboard.setOnClickListener(this)
         binding.toggleLock.setOnClickListener(this)
-        // Home button for recents feature disabled
-        // binding.homeButtonRecents.setOnClickListener(this)
         binding.homeAppsNum.setOnClickListener(this)
         binding.screenTimeOnOff.setOnClickListener(this)
-        binding.dailyWallpaperUrl.setOnClickListener(this)
-        binding.dailyWallpaper.setOnClickListener(this)
+        binding.cardWallpaperGallery.setOnClickListener(this)
+        binding.cardBottomHud.setOnClickListener(this)
         binding.alignment.setOnClickListener(this)
         binding.statusBar.setOnClickListener(this)
         binding.dateTime.setOnClickListener(this)
@@ -202,15 +187,8 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         binding.appThemeText.setOnClickListener(this)
         binding.textSizeValue.setOnClickListener(this)
         binding.boldFont.setOnClickListener(this)
-
-        binding.share.setOnClickListener(this)
-        binding.rate.setOnClickListener(this)
-        binding.twitter.setOnClickListener(this)
-        binding.github.setOnClickListener(this)
-        binding.privacy.setOnClickListener(this)
         binding.footer.setOnClickListener(this)
 
-        binding.dailyWallpaper.setOnLongClickListener(this)
         binding.alignment.setOnLongClickListener(this)
         binding.appThemeText.setOnLongClickListener(this)
         binding.swipeLeftApp.setOnLongClickListener(this)
@@ -384,7 +362,7 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
             requireContext().showToast(getString(R.string.no_hidden_apps))
             return
         }
-        AntiCheatDialog.show(requireContext()) {
+        FrictionGateDialog.show(requireContext(), FrictionGateDialog.GateType.HIDDEN_APPS, "Hidden Apps") {
             viewModel.getHiddenApps()
             findNavController().navigate(
                 R.id.action_settingsFragment_to_appListFragment,
@@ -400,11 +378,11 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         binding.tvChallengeDaySetting.text = "Day $currentDay of ${prefs.challengeTargetDays}"
         binding.tvDetoxStreakSetting.text = "$streak ${if (streak == 1) "Day" else "Days"} 🔥"
         binding.tvStreakRequirementSetting.text = if (req >= 100) "Strict (100%)" else "Flexible (80%)"
-        binding.tvDailyHabitsSetting.text = "Configure"
+        val habitsCount = DisciplineManager.getDefaultHabits(requireContext()).size
+        binding.tvDailyHabitsSetting.text = "$habitsCount ${if (habitsCount == 1) "Habit" else "Habits"}"
         binding.tvPickupLimitSetting.text = "${prefs.pickupLimit} Pickups"
-        val appCount = prefs.distractingApps.size
+        val appCount = DisciplineManager.getValidDistractingApps(requireContext()).size
         binding.tvDistractingAppsSetting.text = "$appCount ${if (appCount == 1) "App" else "Apps"}"
-        binding.tvAntiCheatSetting.text = "${prefs.antiCheatCooldownSeconds}s Cooldown"
     }
 
     private fun showChallengeDialog() {
@@ -442,17 +420,29 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         val best = DisciplineManager.getBestStreak(requireContext())
         val req = DisciplineManager.getStreakRequirement(requireContext())
         val reqText = if (req >= 100) "Strict (100%)" else "Flexible (80%)"
-        AlertDialog.Builder(requireContext())
-            .setTitle("Habit Streak")
-            .setMessage("Current active streak: $streak days 🔥\nBest streak: $best days\nRequirement: $reqText")
+        val remaining = DisciplineManager.getStreakFreezesRemaining(requireContext())
+        val isShieldActive = DisciplineManager.isStreakFreezeActiveToday(requireContext())
+        val shieldStatus = if (isShieldActive) "Active Today 🛡️" else "Inactive"
+
+        val builder = AlertDialog.Builder(requireContext())
+            .setTitle("Habit Streak & Freeze Shield")
+            .setMessage("Current active streak: $streak days 🔥\nBest streak: $best days\nRequirement: $reqText\n\nFreeze Shield: $shieldStatus\nFreezes remaining: $remaining / 3 this month")
             .setPositiveButton(R.string.okay, null)
-            .setNeutralButton("Reset Streak to 0") { _, _ ->
+            .setNeutralButton("Reset Streak") { _, _ ->
                 prefs.habitStreakCount = 0
                 populateDisciplineSettings()
                 viewModel.refreshHome.postValue(false)
                 requireContext().showToast("Streak reset to 0.")
             }
-            .show()
+
+        if (!isShieldActive && remaining > 0) {
+            builder.setNegativeButton("Activate Shield") { _, _ ->
+                DisciplineManager.activateStreakFreezeToday(requireContext())
+                requireContext().showToast("Streak Freeze Shield activated for today! 🛡️")
+                populateDisciplineSettings()
+            }
+        }
+        builder.show()
     }
 
     private fun showStreakRequirementDialog() {
@@ -472,30 +462,53 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
     }
 
     private fun showConfigureHabitsDialog() {
+        val dialog = OlDialog(requireContext())
+        val dialogBinding = DialogConfigureHabitsBinding.inflate(LayoutInflater.from(dialog.context))
+        dialog.setView(dialogBinding.root)
+
         val habits = DisciplineManager.getDefaultHabits(requireContext())
-        val input = EditText(requireContext()).apply {
-            isSingleLine = false
-            setLines(6)
-            setText(habits.joinToString("\n"))
+        dialogBinding.etHabitsContent.setText(habits.joinToString("\n"))
+
+        fun updateCounter() {
+            val count = dialogBinding.etHabitsContent.text.toString()
+                .split("\n")
+                .map { it.trim() }
+                .count { it.isNotBlank() }
+            dialogBinding.tvHabitsCounter.text = "$count habits configured • Recommended: 5"
         }
-        AlertDialog.Builder(requireContext())
-            .setTitle("Daily Habits")
-            .setMessage("Enter your daily recurring habits (one per line):")
-            .setView(input)
-            .setPositiveButton(R.string.okay) { _, _ ->
-                val lines = input.text.toString().split("\n")
-                    .map { it.trim() }
-                    .filter { it.isNotBlank() }
-                    .take(5)
-                if (lines.isNotEmpty()) {
-                    DisciplineManager.setDefaultHabits(requireContext(), lines)
-                    populateDisciplineSettings()
-                    viewModel.refreshHome.postValue(false)
-                    requireContext().showToast("Habits updated!")
-                }
+
+        updateCounter()
+
+        dialogBinding.etHabitsContent.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                updateCounter()
             }
-            .setNegativeButton(android.R.string.cancel, null)
-            .show()
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        dialogBinding.btnCancelHabits.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnSaveHabits.setOnClickListener {
+            val lines = dialogBinding.etHabitsContent.text.toString().split("\n")
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+
+            if (lines.isEmpty()) {
+                requireContext().showToast("Please enter at least one habit")
+                return@setOnClickListener
+            }
+
+            DisciplineManager.updateHabitsAndSyncToday(requireContext(), lines)
+            populateDisciplineSettings()
+            viewModel.refreshHome.postValue(false)
+            requireContext().showToast("${lines.size} habits synced with Home Screen!")
+            dialog.dismiss()
+        }
+
+        dialog.showRespectingStatusBar()
     }
 
     private fun showPickupLimitDialog() {
@@ -513,31 +526,7 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
             .show()
     }
 
-    private fun showDistractingAppsWithAntiCheat() {
-        AntiCheatDialog.show(requireContext()) {
-            ManageDistractingAppsDialog.show(requireContext()) {
-                populateDisciplineSettings()
-                viewModel.getAppList()
-                viewModel.refreshHome.postValue(false)
-            }
-        }
-    }
 
-    private fun showAntiCheatSettingsDialog() {
-        AntiCheatDialog.show(requireContext()) {
-            val options = arrayOf("30 Seconds Cooldown", "60 Seconds Cooldown", "90 Seconds Cooldown")
-            val values = arrayOf(30, 60, 90)
-            AlertDialog.Builder(requireContext())
-                .setTitle("Anti-Cheat Cooldown Duration")
-                .setItems(options) { _, which ->
-                    prefs.antiCheatCooldownSeconds = values[which]
-                    populateDisciplineSettings()
-                    requireContext().showToast("Cooldown set to ${values[which]}s")
-                }
-                .setNegativeButton(android.R.string.cancel, null)
-                .show()
-        }
-    }
 
     private fun showBackupRestoreDialog() {
         BackupRestoreDialog.show(requireContext()) {
@@ -604,21 +593,7 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         }
         if (!prefs.dailyWallpaper) return
         prefs.dailyWallpaper = false
-        populateWallpaperText()
         viewModel.cancelWallpaperWorker()
-    }
-
-    private fun toggleDailyWallpaperUpdate() {
-        if (prefs.dailyWallpaper.not() && prefs.appTheme == AppCompatDelegate.MODE_NIGHT_YES && viewModel.isOlauncherDefault.value == false) {
-            requireContext().showToast(R.string.set_as_default_launcher_first)
-            return
-        }
-        prefs.dailyWallpaper = !prefs.dailyWallpaper
-        populateWallpaperText()
-        if (prefs.dailyWallpaper) {
-            viewModel.setWallpaperWorker()
-            showWallpaperToasts()
-        } else viewModel.cancelWallpaperWorker()
     }
 
     private fun showWallpaperToasts() {
@@ -737,9 +712,27 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         else binding.autoShowKeyboard.text = getString(R.string.off)
     }
 
-    private fun populateWallpaperText() {
-        if (prefs.dailyWallpaper) binding.dailyWallpaper.text = getString(R.string.on)
-        else binding.dailyWallpaper.text = getString(R.string.off)
+    private fun populateWallpaperGallery() {
+        binding.tvWallpaperGallery.text = "Choose from Gallery"
+    }
+
+    private fun populateBottomHudSetting() {
+        binding.tvBottomHudSetting.text = if (prefs.bottomHudEnabled) getString(R.string.on) else getString(R.string.off)
+    }
+
+    private fun openGalleryWallpaper() {
+        try {
+            val intent = Intent(Intent.ACTION_SET_WALLPAPER)
+            startActivity(Intent.createChooser(intent, "Set Wallpaper via Gallery"))
+        } catch (e: Exception) {
+            requireContext().showToast("Could not open wallpaper picker")
+        }
+    }
+
+    private fun toggleBottomHud() {
+        prefs.bottomHudEnabled = !prefs.bottomHudEnabled
+        populateBottomHudSetting()
+        viewModel.refreshHome.postValue(false)
     }
 
     private fun updateHomeBottomAlignment() {
@@ -822,20 +815,7 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         )
     }
 
-    private fun populateActionHints() {
-        if (prefs.aboutClicked.not())
-            binding.aboutOlauncher.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info, 0)
-        if (viewModel.isOlauncherDefault.value != true) return
-        if (prefs.rateClicked.not() && prefs.toShowHintCounter > Constants.HINT_RATE_US && prefs.toShowHintCounter < Constants.HINT_RATE_US + 100)
-            binding.rate.setCompoundDrawablesWithIntrinsicBounds(0, android.R.drawable.arrow_down_float, 0, 0)
-    }
 
-    private fun populateProMessage() {
-        if (prefs.proMessageShown.not() && prefs.userState == Constants.UserState.SHARE) {
-            prefs.proMessageShown = true
-            viewModel.showDialog.postValue(Constants.Dialog.PRO_MESSAGE)
-        }
-    }
 
     override fun onDestroyView() {
         // Dismissing the text size dialog applies any pending scale via its dismiss listener

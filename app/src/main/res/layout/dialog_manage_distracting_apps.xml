@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Checked apps require a 10s breathing pause + math challenge, and lock when daily limit is reached."
+        android:text="Guarded apps display daily allowance telemetry on launch, and lock once daily limit is reached."
         android:textColor="?attr/primaryColorTrans80" />
 
     <androidx.recyclerview.widget.RecyclerView

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="22dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="24dp">
+
+    <TextView
+        style="@style/TextLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Daily Focus Habits"
+        android:textColor="?attr/primaryColor"
+        android:textSize="22sp" />
+
+    <TextView
+        style="@style/TextSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Configure your daily recurring protocol tasks.\n5 habits recommended; feel free to add more."
+        android:textColor="?attr/primaryColorTrans80"
+        android:textSize="13sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_home_tasks_card"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <EditText
+            android:id="@+id/etHabitsContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:fontFamily="@font/geist_regular"
+            android:gravity="top|start"
+            android:hint="Morning Workout (45 min)&#10;Read 20 Pages&#10;Deep Work Session (2 hr)..."
+            android:inputType="textMultiLine|textCapSentences"
+            android:lineSpacingExtra="4dp"
+            android:minLines="6"
+            android:maxLines="12"
+            android:scrollbars="vertical"
+            android:textColor="?attr/primaryColor"
+            android:textColorHint="?attr/primaryColorTrans50"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvHabitsCounter"
+        style="@style/TextSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="4dp"
+        android:fontFamily="@font/geist_mono"
+        android:textColor="?attr/primaryColorTrans80"
+        android:textSize="12sp"
+        tools:text="5 habits configured • Recommended: 5" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btnCancelHabits"
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:padding="10dp"
+            android:text="@android:string/cancel"
+            android:textColor="?attr/primaryColorTrans80"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/btnSaveHabits"
+            style="@style/TextSmallBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:background="?attr/selectableItemBackground"
+            android:padding="10dp"
+            android:text="Save &amp; Sync"
+            android:textColor="?attr/primaryColor"
+            android:textSize="15sp" />
+
+    </LinearLayout>
+
+</LinearLayout>

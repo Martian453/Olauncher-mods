@@ -5,11 +5,15 @@
     <attr name="primaryTextShadowColor" format="color" />
     <attr name="primaryColorTrans50" format="color" />
     <attr name="primaryColorTrans80" format="color" />
+    <attr name="primaryColorTrans10" format="color" />
+    <attr name="primaryColorTrans25" format="color" />
     <attr name="primaryColorInverseTrans90" format="color" />
     <attr name="primaryColorInverseTrans80" format="color" />
     <attr name="primaryColorInverseTrans50" format="color" />
     <attr name="primaryShadeColor" format="color" />
     <attr name="dialogShadeColor" format="color" />
     <attr name="primaryShadeDarkColor" format="color" />
-    <attr name="mainFontFamily" format="string" />
+    <attr name="mainFontFamily" format="reference|string" />
+    <attr name="headingFontFamily" format="reference|string" />
+    <attr name="monoFontFamily" format="reference|string" />
 </resources>

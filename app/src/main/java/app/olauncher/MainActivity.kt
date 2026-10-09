@@ -24,6 +24,7 @@ import androidx.navigation.findNavController
 import app.olauncher.data.Constants
 import app.olauncher.data.Prefs
 import app.olauncher.databinding.ActivityMainBinding
+import app.olauncher.helper.DisciplineManager
 import app.olauncher.helper.getColorFromAttr
 import app.olauncher.helper.hasBeenDays
 import app.olauncher.helper.hasBeenHours
@@ -48,7 +49,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Calendar
-import app.olauncher.helper.DisciplineManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -157,20 +157,31 @@ class MainActivity : AppCompatActivity() {
     private fun registerShortcutCallback() {
         val launcherApps = getSystemService(LauncherApps::class.java)
         launcherAppsCallback = object : LauncherApps.Callback() {
-            override fun onPackageRemoved(packageName: String, user: android.os.UserHandle) = Unit
-            override fun onPackageAdded(packageName: String, user: android.os.UserHandle) = Unit
-            override fun onPackageChanged(packageName: String, user: android.os.UserHandle) = Unit
+            override fun onPackageRemoved(packageName: String, user: android.os.UserHandle) {
+                viewModel.getAppList()
+                DisciplineManager.getValidDistractingApps(this@MainActivity)
+            }
+            override fun onPackageAdded(packageName: String, user: android.os.UserHandle) {
+                viewModel.getAppList()
+            }
+            override fun onPackageChanged(packageName: String, user: android.os.UserHandle) {
+                viewModel.getAppList()
+            }
             override fun onPackagesAvailable(
                 packageNames: Array<out String>,
                 user: android.os.UserHandle,
                 replacing: Boolean,
-            ) = Unit
+            ) {
+                viewModel.getAppList()
+            }
 
             override fun onPackagesUnavailable(
                 packageNames: Array<out String>,
                 user: android.os.UserHandle,
                 replacing: Boolean,
-            ) = Unit
+            ) {
+                viewModel.getAppList()
+            }
 
             override fun onShortcutsChanged(
                 packageName: String,
@@ -314,42 +325,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        when (prefs.userState) {
-            Constants.UserState.START -> {
-                if (prefs.firstOpenTime.hasBeenMinutes(10))
-                    prefs.userState = Constants.UserState.WALLPAPER
-            }
-
-            Constants.UserState.WALLPAPER -> {
-                if (prefs.wallpaperMsgShown || prefs.dailyWallpaper)
-                    prefs.userState = Constants.UserState.REVIEW
-                else if (isOlauncherDefault(this))
-                    viewModel.showDialog.postValue(Constants.Dialog.WALLPAPER)
-            }
-
-            Constants.UserState.REVIEW -> {
-                if (prefs.rateClicked)
-                    prefs.userState = Constants.UserState.SHARE
-                else if (isOlauncherDefault(this) && prefs.firstOpenTime.hasBeenHours(1))
-                    viewModel.showDialog.postValue(Constants.Dialog.REVIEW)
-            }
-
-            Constants.UserState.RATE -> {
-                if (prefs.rateClicked)
-                    prefs.userState = Constants.UserState.SHARE
-                else if (isOlauncherDefault(this)
-                    && prefs.firstOpenTime.isDaySince() >= 7
-                    && calendar.get(Calendar.HOUR_OF_DAY) >= 16
-                ) viewModel.showDialog.postValue(Constants.Dialog.RATE)
-            }
-
-            Constants.UserState.SHARE -> {
-                if (isOlauncherDefault(this) && prefs.firstOpenTime.hasBeenDays(14)
-                    && prefs.shareShownTime.isDaySince() >= 70
-                    && calendar.get(Calendar.HOUR_OF_DAY) >= 16
-                ) viewModel.showDialog.postValue(Constants.Dialog.SHARE)
-            }
-        }
+        // Marketing, review, and internet wallpaper nags permanently disabled for THE KNIGHT
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -393,8 +369,11 @@ class MainActivity : AppCompatActivity() {
         timerJob?.cancel()
         timerJob = lifecycleScope.launch {
             delay(200)
-            if ((prefs.appTheme == AppCompatDelegate.MODE_NIGHT_YES && getColorFromAttr(R.attr.primaryColor) != getColor(R.color.white))
-                || (prefs.appTheme == AppCompatDelegate.MODE_NIGHT_NO && getColorFromAttr(R.attr.primaryColor) != getColor(R.color.black))
+            val currentPrimary = getColorFromAttr(R.attr.primaryColor)
+            val isNightValid = currentPrimary == getColor(R.color.white) || currentPrimary == getColor(R.color.stitch_primary)
+            val isDayValid = currentPrimary == getColor(R.color.black)
+            if ((prefs.appTheme == AppCompatDelegate.MODE_NIGHT_YES && !isNightValid)
+                || (prefs.appTheme == AppCompatDelegate.MODE_NIGHT_NO && !isDayValid)
             )
                 restartLauncherOrCheckTheme(true)
         }

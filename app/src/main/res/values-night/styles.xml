@@ -27,23 +27,27 @@
         <!--        <item name="android:windowTranslucentStatus">false</item>-->
         <!--        <item name="android:windowTranslucentNavigation">true</item>-->
 
-        <item name="colorPrimary">@color/white</item>
-        <item name="colorPrimaryDark">@android:color/darker_gray</item>
-        <item name="colorAccent">@color/white</item>
+        <item name="colorPrimary">@color/stitch_primary</item>
+        <item name="colorPrimaryDark">@color/stitch_surface</item>
+        <item name="colorAccent">@color/stitch_flame</item>
 
-        <item name="primaryColor">@color/white</item>
-        <item name="primaryInverseColor">@color/whiteInverse</item>
-        <item name="primaryTextShadowColor">@color/whiteInverseTrans50</item>
-        <item name="primaryColorTrans50">@color/whiteTrans50</item>
-        <item name="primaryColorTrans80">@color/whiteTrans80</item>
-        <item name="primaryColorInverseTrans50">@color/whiteInverseTrans50</item>
-        <item name="primaryColorInverseTrans80">@color/whiteInverseTrans80</item>
-        <item name="primaryColorInverseTrans90">@color/whiteInverseTrans90</item>
-        <item name="primaryShadeColor">@color/whiteInverseTrans10</item>
-        <item name="primaryShadeDarkColor">@color/whiteInverseTrans25</item>
-        <item name="dialogShadeColor">@color/whiteInverseTrans50</item>
+        <item name="primaryColor">@color/stitch_primary</item>
+        <item name="primaryInverseColor">@color/stitch_surface</item>
+        <item name="primaryTextShadowColor">@android:color/transparent</item>
+        <item name="primaryColorTrans50">@color/stitch_on_surface_variant</item>
+        <item name="primaryColorTrans80">@color/stitch_outline</item>
+        <item name="primaryColorTrans10">@color/stitch_surface_container_low</item>
+        <item name="primaryColorTrans25">@color/stitch_outline_variant</item>
+        <item name="primaryColorInverseTrans50">@color/stitch_surface_container</item>
+        <item name="primaryColorInverseTrans80">@color/stitch_surface_container_high</item>
+        <item name="primaryColorInverseTrans90">@color/stitch_surface_container_highest</item>
+        <item name="primaryShadeColor">@color/stitch_surface_container_low</item>
+        <item name="primaryShadeDarkColor">@color/stitch_outline_variant</item>
+        <item name="dialogShadeColor">@color/stitch_surface_container</item>
 
-        <item name="mainFontFamily">sans-serif-light</item>
+        <item name="mainFontFamily">@font/geist_regular</item>
+        <item name="headingFontFamily">@font/outfit</item>
+        <item name="monoFontFamily">@font/geist_mono</item>
 
         <!-- Popup menus and dialogs used by settings -->
         <item name="popupMenuStyle">@style/OlPopupMenu</item>
@@ -51,6 +55,11 @@
         <item name="textAppearanceSmallPopupMenu">@style/OlPopupMenuText</item>
         <item name="alertDialogTheme">@style/OlAlertDialog</item>
 
+    </style>
+
+    <!-- Applied over AppTheme when bold font is enabled -->
+    <style name="BoldFontOverlay">
+        <item name="mainFontFamily">@font/geist_medium</item>
     </style>
 
     <style name="WindowAnimationTransition">
@@ -70,6 +79,7 @@
     </style>
 
     <style name="TextDefault" parent="@android:style/TextAppearance.Large">
+        <item name="android:fontFamily">?attr/mainFontFamily</item>
         <item name="android:textColor">@drawable/text_colors_default</item>
         <item name="android:textColorHint">?attr/primaryColorTrans80</item>
         <item name="android:shadowColor">?attr/primaryTextShadowColor</item>
@@ -80,6 +90,7 @@
 
     <style name="TextLarge" parent="TextDefault">
         <item name="android:fontFamily">?attr/mainFontFamily</item>
+        <item name="android:letterSpacing">-0.01</item>
         <item name="android:textSize">@dimen/text_large</item>
     </style>
 

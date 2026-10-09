@@ -17,7 +17,8 @@
             style="@style/TextLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Evening Review"
+            android:fontFamily="@font/outfit"
+            android:text="EVENING REVIEW"
             android:textColor="?attr/primaryColor"
             android:textSize="22sp" />
 
@@ -26,7 +27,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Take 30 seconds to lock in today's progress and prepare tomorrow."
+            android:fontFamily="@font/geist_regular"
+            android:text="Lock in today's discipline score and prepare tomorrow's protocol."
             android:textColor="?attr/primaryColorTrans80" />
 
         <!-- Detox Question -->
@@ -35,7 +37,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Did you stay clean today?"
+            android:fontFamily="@font/geist_medium"
+            android:letterSpacing="0.04"
+            android:text="Did you stay clean and adhere to the protocol?"
             android:textColor="?attr/primaryColor" />
 
         <RadioGroup
@@ -50,6 +54,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checked="true"
+                android:fontFamily="@font/geist_regular"
                 android:text="Yes, stayed clean! (+1 Day 🔥)"
                 android:textColor="?attr/primaryColor" />
 
@@ -58,6 +63,7 @@
                 style="@style/TextSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/geist_regular"
                 android:text="No, I slipped up (Reset streak to 0)"
                 android:textColor="?attr/primaryColorTrans80" />
         </RadioGroup>
@@ -68,6 +74,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:fontFamily="@font/geist_medium"
+            android:letterSpacing="0.04"
             android:text="Tomorrow's 5 Non-Negotiable Tasks:"
             android:textColor="?attr/primaryColor" />
 
@@ -77,6 +85,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:fontFamily="@font/geist_mono"
             android:hint="1. Task"
             android:textColor="?attr/primaryColor" />
 
@@ -86,6 +95,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:fontFamily="@font/geist_mono"
             android:hint="2. Task"
             android:textColor="?attr/primaryColor" />
 
@@ -95,6 +105,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:fontFamily="@font/geist_mono"
             android:hint="3. Task"
             android:textColor="?attr/primaryColor" />
 
@@ -104,6 +115,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:fontFamily="@font/geist_mono"
             android:hint="4. Task"
             android:textColor="?attr/primaryColor" />
 
@@ -113,6 +125,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:fontFamily="@font/geist_mono"
             android:hint="5. Task"
             android:textColor="?attr/primaryColor" />
 
@@ -123,12 +136,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:background="@drawable/rounded_rect_shade_color"
+            android:background="@drawable/rounded_rectangle_dark"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/geist_medium"
             android:gravity="center"
-            android:padding="14dp"
-            android:text="Lock In Tomorrow"
+            android:letterSpacing="0.04"
+            android:paddingVertical="12dp"
+            android:text="LOCK IN TOMORROW"
+            android:textAllCaps="true"
             android:textColor="?attr/primaryColor"
-            android:textSize="17sp" />
+            android:textSize="13sp" />
 
     </LinearLayout>
 </ScrollView>

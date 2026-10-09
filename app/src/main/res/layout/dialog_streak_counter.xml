@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_home_tasks_card"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="28dp">
+
+    <TextView
+        style="@style/TextSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/geist_medium"
+        android:letterSpacing="0.08"
+        android:text="STREAK PROTOCOL"
+        android:textAllCaps="true"
+        android:textColor="?attr/primaryColorTrans50"
+        android:textSize="11sp" />
+
+    <TextView
+        android:id="@+id/tvStreakCountLarge"
+        style="@style/TextLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/outfit"
+        android:textColor="?attr/primaryColor"
+        android:textSize="34sp"
+        tools:text="🔥 5 Days" />
+
+    <TextView
+        android:id="@+id/tvStreakBest"
+        style="@style/TextSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/geist_mono"
+        android:letterSpacing="0.04"
+        android:textColor="?attr/primaryColorTrans50"
+        android:textSize="12sp"
+        tools:text="Personal Best: 12 Days" />
+
+    <!-- Center Tap-Counter Button -->
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp">
+
+        <TextView
+            android:id="@+id/btnTapCounterPlus"
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:background="@drawable/bg_tap_counter_circle"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/outfit"
+            android:gravity="center"
+            android:text="+1"
+            android:textColor="?attr/primaryInverseColor"
+            android:textSize="28sp" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tvStreakStatusMessage"
+        style="@style/TextSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:fontFamily="@font/geist_regular"
+        android:gravity="center"
+        android:text="Tap to log today's streak manually."
+        android:textColor="?attr/primaryColorTrans50"
+        android:textSize="13sp" />
+
+    <!-- Streak Freeze Shield Card -->
+    <LinearLayout
+        android:id="@+id/layoutStreakFreeze"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/rounded_rect_shade_color"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <TextView
+            style="@style/TextSmallBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/geist_medium"
+            android:letterSpacing="0.06"
+            android:text="🛡️ STREAK FREEZE SHIELD"
+            android:textColor="?attr/primaryColor"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/tvFreezeStatus"
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/geist_mono"
+            android:gravity="center"
+            android:text="3 / 3 freezes available this month"
+            android:textColor="?attr/primaryColorTrans50"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/btnActivateFreeze"
+            style="@style/TextSmallBold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_home_tasks_card"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/geist_medium"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="🛡️ Activate Shield for Today"
+            android:textColor="?attr/primaryColor"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/btnStreakClose"
+        style="@style/TextSmallBold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_rect_shade_color"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/geist_medium"
+        android:gravity="center"
+        android:padding="12dp"
+        android:text="Close"
+        android:textColor="?attr/primaryColor"
+        android:textSize="14sp" />
+
+</LinearLayout>

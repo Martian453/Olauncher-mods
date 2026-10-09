@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_home_tasks_card"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="28dp">
+
+    <!-- Eyebrow label -->
+    <TextView
+        style="@style/TextSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/geist_medium"
+        android:letterSpacing="0.12"
+        android:text="⚔️ HONOR UNLOCKED"
+        android:textAllCaps="true"
+        android:textColor="?attr/primaryColorTrans50"
+        android:textSize="11sp" />
+
+    <!-- Big Honor Emoji Icon -->
+    <TextView
+        android:id="@+id/tvCeremonyIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:textSize="56sp"
+        tools:text="⚔️" />
+
+    <!-- Honor Title -->
+    <TextView
+        android:id="@+id/tvCeremonyTitle"
+        style="@style/TextLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="@font/outfit"
+        android:gravity="center"
+        android:textColor="?attr/primaryColor"
+        android:textSize="28sp"
+        tools:text="Iron Week" />
+
+    <!-- Subtitle / Requirement -->
+    <TextView
+        android:id="@+id/tvCeremonySubtitle"
+        style="@style/TextSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:fontFamily="@font/geist_mono"
+        android:gravity="center"
+        android:letterSpacing="0.04"
+        android:textColor="?attr/primaryColorTrans80"
+        android:textSize="13sp"
+        tools:text="7-Day Streak Achieved • Added to profile" />
+
+    <!-- Motto / Maxim Divider Card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_rect_shade_color"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
+
+        <TextView
+            android:id="@+id/tvCeremonyMotto"
+            style="@style/TextSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/geist_regular"
+            android:gravity="center"
+            android:letterSpacing="0.02"
+            android:text="“Discipline is the forge of true freedom.”"
+            android:textColor="?attr/primaryColorTrans50"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <!-- Claim / Dismiss Button -->
+    <TextView
+        android:id="@+id/btnClaimCeremony"
+        style="@style/TextMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_tap_counter_circle"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="@font/geist_medium"
+        android:gravity="center"
+        android:letterSpacing="0.06"
+        android:paddingVertical="14dp"
+        android:text="CLAIM HONOR"
+        android:textAllCaps="true"
+        android:textColor="?attr/primaryInverseColor"
+        android:textSize="13sp" />
+
+</LinearLayout>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name" translatable="false">Olauncher</string>
+    <string name="app_name" translatable="false">THE KNIGHT</string>
     <string name="github" translatable="false">Github</string>
     <string name="lock_layout_description" translatable="false">lock layout description to be used a unique id to lock screen</string>
     <!-- Home button for recents feature disabled -->
@@ -8,7 +8,7 @@
     <string name="digital_minimalism" translatable="false"><u>Digital Minimalism</u></string>
     <string name="new_app_note_safe" translatable="false"><u>Note to Self</u>\n<sub><small>(Ad-Free)</small></sub></string>
     <string name="new_app_minimal_todo_lists" translatable="false"><u>Minimal Todo Lists</u>\n<sub><small>(Ad-Free)</small></sub></string>
-    <string name="day_battery" formatted="false" translatable="false">%s, %d%%</string>
+    <string name="day_battery" formatted="false" translatable="false">%s • %d%%</string>
     <string name="tag_0" translatable="false">0</string>
     <string name="tag_1" translatable="false">1</string>
     <string name="tag_2" translatable="false">2</string>
@@ -78,8 +78,11 @@
     <string name="system_default">System</string>
     <string name="dark">Dark</string>
     <string name="light">Light</string>
-    <string name="welcome_to_olauncher_settings">Welcome to the settings!
-        \n\nRemember, if you have any questions, our About page has the answer.</string>
+    <string name="welcome_to_olauncher_settings">Welcome to the challenge!
+        \n\nProtocol Directives:
+        \n1. Changing default launcher is strictly forbidden.
+        \n2. Bypassing focus via Google Assistant or voice search is forbidden. Turn off assistant shortcuts and maintain discipline.
+        \n3. If you want custom wallpapers, set them directly from your device Gallery.</string>
     <string name="rate_us_message">Hi, you won\'t see this message again.
         \n\nIf you\'re finding Olauncher useful, could you please leave a 5-star review? It\'ll mean the world to us. Thank you!</string>
     <string name="share_message">We need your help! We believe everyone should know about Olauncher and its benefits, but we can\'t do it alone.
@@ -111,7 +114,7 @@
     <string name="please_set_olauncher_as_default_first">Please set Olauncher as default first</string>
     <string name="affiliate">Affiliate</string>
     <string name="tip_start_typing_for_rename">Tip: Start typing for app RENAME option</string>
-    <string name="hidden_apps_message">Note: Tap on \'Olauncher\' at the top of this Settings page to find your hidden apps.\n\nMore details available in our About page.</string>
+    <string name="hidden_apps_message">Note: Tap on \'THE KNIGHT\' at the top of this Settings page to find your hidden apps.</string>
     <string name="accessibility_disclosure">Please turn on Olauncher\'s accessibility service in your device\'s settings to enable Double tap to lock gesture.
     \n\nPlease note that this service is only used for this particular feature. Our accessibility service does not collect or share any data.</string>
     <string name="accept">Accept</string>

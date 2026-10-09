@@ -23,6 +23,9 @@ import app.olauncher.databinding.AdapterPrivateSpaceHeaderBinding
 import app.olauncher.helper.hideKeyboard
 import app.olauncher.helper.isSystemApp
 import app.olauncher.helper.showKeyboard
+import androidx.appcompat.app.AlertDialog
+import app.olauncher.data.Prefs
+import app.olauncher.helper.showToast
 import app.olauncher.helper.DisciplineManager
 import java.text.Normalizer
 
@@ -176,11 +179,6 @@ class AppDrawerAdapter(
                 && appFilteredList[0] !is AppModel.PrivateSpaceHeader
             ) {
                 val app = appFilteredList[0]
-                context?.let { ctx ->
-                    if (app.appPackage.isNotEmpty() && DisciplineManager.isAppDistracting(ctx, app.appPackage)) {
-                        return
-                    }
-                }
                 appClickListener(app)
             }
         } catch (e: Exception) {
@@ -287,6 +285,8 @@ class AppDrawerAdapter(
                     appHideLayout.visibility = View.VISIBLE
                     // Only allow renaming non hidden apps
                     appRename.isVisible = flag != Constants.FLAG_HIDDEN_APPS
+                    val isDistracting = DisciplineManager.isAppDistracting(root.context, appModel.appPackage)
+                    appDistract.text = if (isDistracting) "Unguard" else "Dstrct"
                 }
                 true
             }
@@ -350,6 +350,52 @@ class AppDrawerAdapter(
             }
             appInfo.setOnClickListener { appInfoListener(appModel) }
             appDelete.setOnClickListener { appDeleteListener(appModel) }
+            appDistract.setOnClickListener {
+                if (appModel.appPackage.isEmpty()) return@setOnClickListener
+                val isDistracting = DisciplineManager.isAppDistracting(root.context, appModel.appPackage)
+                if (isDistracting) {
+                    AlertDialog.Builder(root.context)
+                        .setTitle("⚠️ Protocol Warning")
+                        .setMessage("Removing \"${appModel.appLabel}\" weakens your focus barrier.\n\nPenalty: Breaking this discipline commitment will immediately reset your focus streak to 0.\n\nAre you sure you want to proceed?")
+                        .setPositiveButton("Proceed & Reset Streak") { _, _ ->
+                            DisciplineManager.setAppDistracting(root.context, appModel.appPackage, false)
+                            val prefs = Prefs(root.context)
+                            prefs.habitStreakCount = 0
+                            prefs.manualStreakUpdatedDate = ""
+                            appHideLayout.visibility = View.GONE
+                            appTitle.visibility = View.VISIBLE
+                            appTitle.text = buildString {
+                                append(appModel.appLabel)
+                                if (appModel.isNew) append(" ✦")
+                            }
+                            bindingAdapter?.notifyItemChanged(bindingAdapterPosition)
+                            root.context.showToast("${appModel.appLabel} un-guarded • Streak reset to 0")
+                        }
+                        .setNegativeButton("Cancel (Keep Guarded)", null)
+                        .show()
+                } else {
+                    val durations = arrayOf("15 mins", "30 mins (Recommended)", "45 mins", "60 mins")
+                    val values = arrayOf(15, 30, 45, 60)
+                    AlertDialog.Builder(root.context)
+                        .setTitle("Guarded Daily Limit: ${appModel.appLabel}")
+                        .setItems(durations) { _, which ->
+                            val selectedMinutes = values[which]
+                            DisciplineManager.setAppDailyLimitMinutes(root.context, appModel.appPackage, selectedMinutes)
+                            DisciplineManager.setAppDistracting(root.context, appModel.appPackage, true)
+                            appHideLayout.visibility = View.GONE
+                            appTitle.visibility = View.VISIBLE
+                            appTitle.text = buildString {
+                                append(appModel.appLabel)
+                                if (appModel.isNew) append(" ✦")
+                                append(" ⏳")
+                            }
+                            bindingAdapter?.notifyItemChanged(bindingAdapterPosition)
+                            root.context.showToast("${appModel.appLabel} guarded (${selectedMinutes}m daily limit)")
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show()
+                }
+            }
             appMenuClose.setOnClickListener {
                 appHideLayout.visibility = View.GONE
                 appTitle.visibility = View.VISIBLE

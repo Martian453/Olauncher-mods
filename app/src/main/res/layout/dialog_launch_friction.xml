@@ -20,123 +20,112 @@
         android:textSize="24sp"
         tools:text="Instagram" />
 
-    <!-- State 1: Breathing Countdown Section -->
+    <!-- State 1: Protocol Notice Section (Clean allowance awareness, zero wait timer) -->
     <LinearLayout
-        android:id="@+id/layoutBreathingCountdown"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="visible">
-
-        <TextView
-            android:id="@+id/tvCountdownSeconds"
-            style="@style/TextLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:textColor="?attr/primaryColor"
-            android:textSize="56sp"
-            tools:text="10" />
-
-        <TextView
-            android:id="@+id/tvBreathingPrompt"
-            style="@style/TextSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:text="Take a pause.\nDo you intentionally need to open this now?"
-            android:textColor="?attr/primaryColorTrans80"
-            android:textSize="16sp" />
-
-        <!-- Prominent Exit Button -->
-        <TextView
-            android:id="@+id/btnPutPhoneDown"
-            style="@style/TextSmallBold"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/rounded_rect_shade_color"
-            android:gravity="center"
-            android:padding="16dp"
-            android:text="Put Phone Down"
-            android:textColor="?attr/primaryColor"
-            android:textSize="18sp" />
-
-    </LinearLayout>
-
-    <!-- State 2: Math Conscious Gate Section -->
-    <LinearLayout
-        android:id="@+id/layoutMathGate"
+        android:id="@+id/layoutFocusNotice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
 
         <TextView
+            android:id="@+id/tvNoticeBadge"
             style="@style/TextSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Solve this conscious check to continue:"
-            android:textColor="?attr/primaryColorTrans80" />
-
-        <TextView
-            android:id="@+id/tvMathProblem"
-            style="@style/TextLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textColor="?attr/primaryColor"
-            android:textSize="28sp"
-            tools:text="34 + 29 = ?" />
-
-        <EditText
-            android:id="@+id/etMathAnswer"
-            style="@style/TextLarge"
-            android:layout_width="160dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:gravity="center"
-            android:hint="Answer"
-            android:inputType="number"
-            android:textColor="?attr/primaryColor"
-            android:textColorHint="?attr/primaryColorTrans50" />
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_telemetry_badge"
+            android:fontFamily="@font/geist_mono"
+            android:paddingStart="10dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="4dp"
+            android:text="🛡️ FOCUS PROTOCOL • GUARDED"
+            android:textAllCaps="true"
+            android:textColor="?attr/primaryColorTrans80"
+            android:textSize="11sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/bg_home_tasks_card"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:padding="20dp">
 
             <TextView
-                android:id="@+id/btnCancelGate"
-                style="@style/TextSmall"
-                android:layout_width="0dp"
+                android:id="@+id/tvAllowanceNotice"
+                style="@style/TextLarge"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="12dp"
-                android:text="Cancel"
-                android:textColor="?attr/primaryColorTrans80" />
-
-            <TextView
-                android:id="@+id/btnUnlockApp"
-                style="@style/TextSmallBold"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:padding="12dp"
-                android:text="Open App"
+                android:fontFamily="@font/outfit"
                 android:textColor="?attr/primaryColor"
-                android:textSize="17sp" />
+                android:textSize="22sp"
+                tools:text="22m Remaining Today" />
+
+            <TextView
+                android:id="@+id/tvAllowanceDetail"
+                style="@style/TextSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/geist_mono"
+                android:textColor="?attr/primaryColorTrans80"
+                android:textSize="13sp"
+                tools:text="8m used of 30m daily limit" />
+
+            <ProgressBar
+                android:id="@+id/progressAllowance"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_marginTop="16dp"
+                android:max="100"
+                android:progress="27" />
+
+            <TextView
+                android:id="@+id/tvNoticeSubtext"
+                style="@style/TextSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:gravity="center"
+                android:text="Intention precedes action.\nEvery minute counts towards your daily score."
+                android:textColor="?attr/primaryColorTrans50"
+                android:textSize="12sp" />
+
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/btnReturnToFocus"
+            style="@style/TextSmallBold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/rounded_rect_shade_color"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="Return to Focus"
+            android:textColor="?attr/primaryColor"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/btnProceedLaunch"
+            style="@style/TextSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:padding="12dp"
+            android:fontFamily="@font/geist_mono"
+            android:textColor="?attr/primaryColorTrans80"
+            android:textSize="13sp"
+            tools:text="Open App (22m left)" />
+
     </LinearLayout>
+
 
     <!-- State 3: Hard Lockout Section -->
     <LinearLayout

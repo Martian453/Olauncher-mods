@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.setPadding
+import android.graphics.Paint
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -30,6 +31,7 @@ import app.olauncher.data.AppModel
 import app.olauncher.data.Constants
 import app.olauncher.data.Prefs
 import app.olauncher.databinding.FragmentHomeBinding
+import app.olauncher.databinding.ItemHomeTaskBinding
 import app.olauncher.helper.appUsagePermissionGranted
 import app.olauncher.helper.dpToPx
 import app.olauncher.helper.expandNotificationDrawer
@@ -87,6 +89,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         if (prefs.showStatusBar) showStatusBar()
         else hideStatusBar()
         checkPickupSlap()
+        checkPendingMilestoneCelebration()
     }
 
     override fun onClick(view: View) {
@@ -96,7 +99,6 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             // R.id.recents -> {}
             R.id.clock -> openClockApp()
             R.id.date -> openCalendarApp()
-            R.id.tvDisciplineBanner -> openCommandCenter()
             R.id.setDefaultLauncher -> viewModel.resetLauncherLiveData.call()
             R.id.tvScreenTime -> openScreenTimeDigitalWellbeing()
 
@@ -197,7 +199,11 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
                 setHomeAlignment()
             }
             if (binding.firstRunTips.isVisible) return@Observer
-            binding.setDefaultLauncher.isVisible = it.not() && prefs.hideSetDefaultLauncher.not()
+            val shouldShow = it.not() && prefs.hideSetDefaultLauncher.not()
+            binding.setDefaultLauncher.isVisible = shouldShow
+            if (shouldShow) {
+                binding.setDefaultLauncher.bringToFront()
+            }
         })
         viewModel.homeAppAlignment.observe(viewLifecycleOwner) {
             setHomeAlignment(it)
@@ -216,7 +222,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     private fun initSwipeTouchListener() {
         val context = requireContext()
-        binding.mainLayout.setOnTouchListener(getSwipeGestureListener(context))
+        val swipeListener = getSwipeGestureListener(context)
+        binding.mainLayout.setOnTouchListener(swipeListener)
         binding.homeApp1.setOnTouchListener(getViewSwipeTouchListener(context, binding.homeApp1))
         binding.homeApp2.setOnTouchListener(getViewSwipeTouchListener(context, binding.homeApp2))
         binding.homeApp3.setOnTouchListener(getViewSwipeTouchListener(context, binding.homeApp3))
@@ -233,7 +240,43 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         // binding.recents.setOnClickListener(this)
         binding.clock.setOnClickListener(this)
         binding.date.setOnClickListener(this)
-        binding.tvDisciplineBanner.setOnClickListener(this)
+
+        binding.tvDayCounter.setOnClickListener {
+            DayProgressDialDialog.show(requireContext())
+        }
+        binding.tvDayCounter.setOnLongClickListener {
+            openCommandCenter()
+            true
+        }
+        binding.tvStreakCounter.setOnClickListener {
+            StreakCounterDialog.show(requireContext()) {
+                populateHomeScreen(false)
+            }
+        }
+        binding.tvStreakCounter.setOnLongClickListener {
+            openCommandCenter()
+            true
+        }
+
+        binding.tvHudHome.setOnClickListener {
+            // Re-render home / scroll to top
+            populateHomeScreen(false)
+        }
+        binding.tvHudIndex.setOnClickListener {
+            showAppList(Constants.FLAG_LAUNCH_APP)
+        }
+        binding.tvHudStats.setOnClickListener {
+            openCommandCenter()
+        }
+        binding.tvHudOpts.setOnClickListener {
+            try {
+                findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
+                viewModel.firstOpen(false)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
         binding.clock.setOnLongClickListener(this)
         binding.date.setOnLongClickListener(this)
         binding.setDefaultLauncher.setOnClickListener(this)
@@ -264,14 +307,28 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         val verticalGravity = if (prefs.homeBottomAlignment) Gravity.BOTTOM else Gravity.TOP
         binding.homeAppsLayout.gravity = horizontalGravity or verticalGravity
 
+        if (horizontalGravity == Gravity.END) {
+            if (binding.layoutHomeColumns.indexOfChild(binding.layoutHomeTasksContainer) > binding.layoutHomeColumns.indexOfChild(binding.homeAppsLayout)) {
+                binding.layoutHomeColumns.removeView(binding.layoutHomeTasksContainer)
+                binding.layoutHomeColumns.addView(binding.layoutHomeTasksContainer, 0)
+            }
+            binding.layoutHomeTasksContainer.setPadding(0, 0, 8.dpToPx(), 0)
+        } else {
+            if (binding.layoutHomeColumns.indexOfChild(binding.homeAppsLayout) > binding.layoutHomeColumns.indexOfChild(binding.layoutHomeTasksContainer)) {
+                binding.layoutHomeColumns.removeView(binding.homeAppsLayout)
+                binding.layoutHomeColumns.addView(binding.homeAppsLayout, 0)
+            }
+            binding.layoutHomeTasksContainer.setPadding(8.dpToPx(), 0, 0, 0)
+        }
+
         if (!prefs.homeBottomAlignment) {
             adjustHomeAppsPadding()
         } else {
-            binding.homeAppsLayout.setPadding(
+            binding.layoutHomeColumns.setPadding(
                 24.dpToPx(),
                 112.dpToPx(),
                 24.dpToPx(),
-                48.dpToPx()
+                if (prefs.bottomHudEnabled) 56.dpToPx() else 48.dpToPx()
             )
         }
 
@@ -298,11 +355,11 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             } else {
                 56.dpToPx()
             }
-            binding.homeAppsLayout.setPadding(
+            binding.layoutHomeColumns.setPadding(
                 24.dpToPx(),
                 paddingTop,
                 24.dpToPx(),
-                48.dpToPx()
+                if (prefs.bottomHudEnabled) 56.dpToPx() else 48.dpToPx()
             )
         }
     }
@@ -357,6 +414,8 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         if (appCountUpdated) hideHomeApps()
         populateDateTime()
         populateDisciplineBanner()
+        populateHomeTasksCard()
+        updateBottomHud()
         updateScreenTimeAndPickups()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -486,10 +545,12 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
             screenTimeString = st,
             onTasksUpdated = {
                 populateDisciplineBanner()
+                populateHomeTasksCard()
             },
             onEveningCheckinRequested = {
                 EveningCheckinDialog.show(requireContext()) {
                     populateDisciplineBanner()
+                    populateHomeTasksCard()
                 }
             }
         )
@@ -497,7 +558,7 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
 
     private fun populateDisciplineBanner() {
         if (!prefs.isChallengeEnabled) {
-            binding.tvDisciplineBanner.visibility = View.GONE
+            binding.layoutBannerSplit.visibility = View.GONE
             binding.progressBarMicro.visibility = View.GONE
             adjustHomeAppsPadding()
             return
@@ -505,17 +566,77 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
         DisciplineManager.checkDateRollover(requireContext())
         val currentDay = DisciplineManager.getCurrentChallengeDay(requireContext())
         val streak = DisciplineManager.getCurrentStreak(requireContext())
-        val tasks = DisciplineManager.getDailyTasks(requireContext())
-        val completedCount = tasks.count { it.isCompleted }
 
-        binding.tvDisciplineBanner.visibility = View.VISIBLE
-        binding.tvDisciplineBanner.text = "Day $currentDay/${prefs.challengeTargetDays} • 🔥 $streak Streak • $completedCount/${tasks.size} Tasks"
+        binding.layoutBannerSplit.visibility = View.VISIBLE
+        binding.tvDayCounter.text = "Day $currentDay/${prefs.challengeTargetDays}"
+        binding.tvStreakCounter.text = "🔥 $streak Streak"
 
         val progress = DisciplineManager.getChallengeProgressPercent(requireContext())
         binding.progressBarMicro.progress = progress
         binding.progressBarMicro.visibility = View.VISIBLE
 
         adjustHomeAppsPadding()
+    }
+
+    private fun populateHomeTasksCard() {
+        if (!prefs.isChallengeEnabled) {
+            binding.layoutHomeTasksContainer.visibility = View.GONE
+            return
+        }
+        binding.layoutHomeTasksContainer.visibility = View.VISIBLE
+        val tasks = DisciplineManager.getDailyTasks(requireContext())
+
+        binding.layoutHomeTasksItems.removeAllViews()
+        val inflater = LayoutInflater.from(requireContext())
+
+        for (task in tasks) {
+            val itemBinding = ItemHomeTaskBinding.inflate(inflater, binding.layoutHomeTasksItems, false)
+            itemBinding.cbHomeTask.isChecked = task.isCompleted
+            itemBinding.tvHomeTask.text = task.title
+
+            if (task.isCompleted) {
+                itemBinding.tvHomeTask.paintFlags = itemBinding.tvHomeTask.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                itemBinding.tvHomeTask.alpha = 0.5f
+            } else {
+                itemBinding.tvHomeTask.paintFlags = itemBinding.tvHomeTask.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                itemBinding.tvHomeTask.alpha = 1.0f
+            }
+
+            itemBinding.root.setOnClickListener {
+                DisciplineManager.toggleTask(requireContext(), task.id)
+                populateDisciplineBanner()
+                populateHomeTasksCard()
+                checkPendingMilestoneCelebration()
+            }
+
+            binding.layoutHomeTasksItems.addView(itemBinding.root)
+        }
+
+        val completedCount = tasks.count { it.isCompleted }
+        val total = tasks.size
+        val pct = if (total > 0) (completedCount * 100) / total else 0
+        binding.tvHomeTasksSummary.text = "$pct% Completed • $completedCount/$total"
+
+        binding.tvHomeTasksHeader.setOnLongClickListener {
+            openCommandCenter()
+            true
+        }
+        binding.tvHomeTasksSummary.setOnLongClickListener {
+            openCommandCenter()
+            true
+        }
+    }
+
+    private fun checkPendingMilestoneCelebration() {
+        if (!isAdded || context == null) return
+        val pending = DisciplineManager.checkPendingMilestoneCelebration(requireContext())
+        if (pending != null) {
+            MilestoneCeremonyDialog.show(requireContext(), pending)
+        }
+    }
+
+    private fun updateBottomHud() {
+        binding.layoutBottomHud.isVisible = prefs.bottomHudEnabled
     }
 
     private fun updateScreenTimeAndPickups(screenTime: String? = viewModel.screenTimeValue.value) {
