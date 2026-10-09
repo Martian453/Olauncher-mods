@@ -13,7 +13,6 @@
 /build
 /captures
 /app/release
-/images
 .externalNativeBuild
 .cxx
 google-services.json
@@ -23,3 +22,4 @@ google-services.json
 *.png
 plan_text.txt
 Olauncher-Discipline-Mod.apk
+!images/**
