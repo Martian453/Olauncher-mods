@@ -599,9 +599,13 @@ object DisciplineManager {
 
     // --- Distracting Apps & Friction Gate ---
 
+    @Volatile
+    private var cachedDistractingApps: Set<String>? = null
+
     fun getValidDistractingApps(context: Context): Set<String> {
         val prefs = Prefs(context)
-        val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as? LauncherApps ?: return prefs.distractingApps
+        val launcherApps = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as? LauncherApps
+            ?: return cachedDistractingApps ?: prefs.distractingApps.also { cachedDistractingApps = it }
         val installedPackages = try {
             launcherApps.getActivityList(null, Process.myUserHandle())
                 .map { it.applicationInfo.packageName }
@@ -609,18 +613,22 @@ object DisciplineManager {
         } catch (e: Exception) {
             emptySet()
         }
-        if (installedPackages.isEmpty()) return prefs.distractingApps
+        if (installedPackages.isEmpty()) {
+            return cachedDistractingApps ?: prefs.distractingApps.also { cachedDistractingApps = it }
+        }
 
         val validSet = prefs.distractingApps.filter { installedPackages.contains(it) }.toSet()
         if (validSet.size != prefs.distractingApps.size) {
             prefs.distractingApps = validSet
         }
+        cachedDistractingApps = validSet
         return validSet
     }
 
     fun isAppDistracting(context: Context, packageName: String): Boolean {
-        val validSet = getValidDistractingApps(context)
-        return validSet.contains(packageName)
+        // Fast path: Instant O(1) in-memory set lookup without Binder IPC or SharedPreferences
+        val set = cachedDistractingApps ?: Prefs(context).distractingApps.also { cachedDistractingApps = it }
+        return set.contains(packageName)
     }
 
     fun setAppDistracting(context: Context, packageName: String, isDistracting: Boolean) {
@@ -628,6 +636,7 @@ object DisciplineManager {
         val set = prefs.distractingApps.toMutableSet()
         if (isDistracting) set.add(packageName) else set.remove(packageName)
         prefs.distractingApps = set
+        cachedDistractingApps = set
     }
 
     fun getAppDailyLimitMinutes(context: Context, packageName: String): Int {

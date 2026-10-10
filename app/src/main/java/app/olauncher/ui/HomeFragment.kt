@@ -782,7 +782,9 @@ class HomeFragment : BaseFragment(), View.OnClickListener, View.OnLongClickListe
     }
 
     private fun showAppList(flag: Int, rename: Boolean = false, includeHiddenApps: Boolean = false) {
-        viewModel.getAppList(includeHiddenApps)
+        if (includeHiddenApps || viewModel.appList.value.isNullOrEmpty()) {
+            viewModel.getAppList(includeHiddenApps)
+        }
         try {
             findNavController().navigate(
                 R.id.action_mainFragment_to_appListFragment,
