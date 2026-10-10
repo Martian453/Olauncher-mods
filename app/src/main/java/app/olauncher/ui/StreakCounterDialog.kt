@@ -32,13 +32,15 @@ object StreakCounterDialog {
 
         val today = getTodayDateString()
         var currentStreak = prefs.habitStreakCount
-        val bestStreak = prefs.bestHabitStreak
 
         fun updateUI() {
+            currentStreak = prefs.habitStreakCount
+            val bestStreak = maxOf(prefs.bestHabitStreak, currentStreak)
             binding.tvStreakCountLarge.text = "🔥 $currentStreak ${if (currentStreak == 1) "Day" else "Days"}"
             binding.tvStreakBest.text = "Personal Best: $bestStreak Days"
 
-            if (prefs.manualStreakUpdatedDate == today) {
+            val isLoggedToday = prefs.manualStreakUpdatedDate == today || prefs.habitsAutoCreditedDate == today
+            if (isLoggedToday) {
                 binding.btnTapCounterPlus.isEnabled = false
                 binding.btnTapCounterPlus.alpha = 0.4f
                 binding.btnTapCounterPlus.text = "✓"
@@ -88,10 +90,10 @@ object StreakCounterDialog {
                 }
             } catch (_: Exception) {}
 
-            currentStreak += 1
-            prefs.habitStreakCount = currentStreak
-            if (currentStreak > prefs.bestHabitStreak) {
-                prefs.bestHabitStreak = currentStreak
+            val newStreak = prefs.habitStreakCount + 1
+            prefs.habitStreakCount = newStreak
+            if (newStreak > prefs.bestHabitStreak) {
+                prefs.bestHabitStreak = newStreak
             }
             prefs.manualStreakUpdatedDate = today
 
