@@ -86,7 +86,6 @@ object DisciplineManager {
     }
 
     fun checkDateRollover(context: Context) {
-        healLostStreakIfNeeded(context)
         val prefs = Prefs(context)
         val today = getTodayDateString()
 
@@ -215,7 +214,7 @@ object DisciplineManager {
             set(Calendar.MILLISECOND, 0)
         }
         val diffMillis = todayCal.timeInMillis - startCal.timeInMillis
-        val days = (diffMillis / (1000L * 60 * 60 * 24)).toInt() + 1
+        val days = Math.round(diffMillis.toDouble() / (1000.0 * 60 * 60 * 24)).toInt() + 1
         return days.coerceAtLeast(1)
     }
 
@@ -308,7 +307,7 @@ object DisciplineManager {
                     prefs.habitsAutoCreditedDate = today
                 }
             } else {
-                if (prefs.habitsAutoCreditedDate == today) {
+                if (prefs.habitsAutoCreditedDate == today && prefs.manualStreakUpdatedDate != today) {
                     prefs.habitStreakCount = (prefs.habitStreakCount - 1).coerceAtLeast(0)
                     prefs.habitsAutoCreditedDate = ""
                 }
@@ -394,7 +393,7 @@ object DisciplineManager {
                 prefs.habitsAutoCreditedDate = today
             }
         } else {
-            if (prefs.habitsAutoCreditedDate == today) {
+            if (prefs.habitsAutoCreditedDate == today && prefs.manualStreakUpdatedDate != today) {
                 prefs.habitStreakCount = (prefs.habitStreakCount - 1).coerceAtLeast(0)
                 prefs.habitsAutoCreditedDate = ""
             }
@@ -451,26 +450,20 @@ object DisciplineManager {
         return true
     }
 
-    fun healLostStreakIfNeeded(context: Context) {
+    fun resetStreakFull(context: Context, resetBestStreak: Boolean = false) {
         val prefs = Prefs(context)
-        if (prefs.habitStreakCount == 0 && prefs.bestHabitStreak >= 1) {
-            // Restore active streak to match the earned best streak (e.g. 1)
-            prefs.habitStreakCount = prefs.bestHabitStreak
-            // Ensure Saturday (2026-10-10) is marked as success in history
-            try {
-                val arr = JSONArray(if (prefs.habitHistoryJson.isNotBlank()) prefs.habitHistoryJson else "[]")
-                var changed = false
-                for (i in 0 until arr.length()) {
-                    val obj = arr.getJSONObject(i)
-                    if (obj.optString("date") == "2026-10-10") {
-                        obj.put("success", true)
-                        changed = true
-                    }
-                }
-                if (changed) {
-                    prefs.habitHistoryJson = arr.toString()
-                }
-            } catch (_: Exception) {}
+        if (!resetBestStreak && prefs.habitStreakCount > prefs.bestHabitStreak) {
+            prefs.bestHabitStreak = prefs.habitStreakCount
+        }
+        prefs.habitStreakCount = 0
+        if (resetBestStreak) {
+            prefs.bestHabitStreak = 0
+        }
+        prefs.manualStreakUpdatedDate = ""
+        prefs.habitsAutoCreditedDate = ""
+        val today = getTodayDateString()
+        if (prefs.streakFreezeActiveDate == today) {
+            prefs.streakFreezeActiveDate = ""
         }
     }
 
@@ -510,11 +503,16 @@ object DisciplineManager {
                 }
                 newArr.put(obj)
             }
-            // Keep at most 30 days of history
+            // Keep at most 30 days of history sorted chronologically
+            val list = mutableListOf<JSONObject>()
+            for (i in 0 until newArr.length()) {
+                list.add(newArr.getJSONObject(i))
+            }
+            list.sortBy { it.optString("date") }
             val trimmed = JSONArray()
-            val startIdx = (newArr.length() - 30).coerceAtLeast(0)
-            for (i in startIdx until newArr.length()) {
-                trimmed.put(newArr.getJSONObject(i))
+            val startIdx = (list.size - 30).coerceAtLeast(0)
+            for (i in startIdx until list.size) {
+                trimmed.put(list[i])
             }
             prefs.habitHistoryJson = trimmed.toString()
         } catch (e: Exception) {

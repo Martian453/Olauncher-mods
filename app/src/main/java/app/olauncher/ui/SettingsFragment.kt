@@ -36,7 +36,6 @@ import app.olauncher.helper.createDialog
 import app.olauncher.helper.getColorFromAttr
 import app.olauncher.helper.hideStatusBar
 import app.olauncher.helper.isAccessServiceEnabled
-import app.olauncher.helper.isDarkThemeOn
 import app.olauncher.helper.isEinkDisplay
 import app.olauncher.helper.isOlauncherDefault
 import app.olauncher.helper.isTablet
@@ -88,7 +87,6 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         // populateHomeButtonRecents()
         populateWallpaperGallery()
         populateBottomHudSetting()
-        populateAppThemeText()
         populateTextSize()
         populateBoldFont()
         populateAlignment()
@@ -130,7 +128,6 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
             R.id.alignment -> showAlignmentMenu(view)
             R.id.statusBar -> toggleStatusBar()
             R.id.dateTime -> showDateTimeMenu(view)
-            R.id.appThemeText -> showAppThemeMenu(view, showSystem = false)
             R.id.textSizeValue -> showTextSizeDialog()
             R.id.boldFont -> toggleBoldFont()
             R.id.swipeLeftApp -> showAppListIfEnabled(Constants.FLAG_SET_SWIPE_LEFT_APP)
@@ -153,7 +150,6 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
                 requireContext().showToast(getString(R.string.alignment_changed))
             }
 
-            R.id.appThemeText -> showAppThemeMenu(view, showSystem = true)
             R.id.swipeLeftApp -> toggleSwipeLeft()
             R.id.swipeRightApp -> toggleSwipeRight()
             R.id.toggleLock -> startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
@@ -184,13 +180,11 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         binding.dateTime.setOnClickListener(this)
         binding.swipeLeftApp.setOnClickListener(this)
         binding.swipeRightApp.setOnClickListener(this)
-        binding.appThemeText.setOnClickListener(this)
         binding.textSizeValue.setOnClickListener(this)
         binding.boldFont.setOnClickListener(this)
         binding.footer.setOnClickListener(this)
 
         binding.alignment.setOnLongClickListener(this)
-        binding.appThemeText.setOnLongClickListener(this)
         binding.swipeLeftApp.setOnLongClickListener(this)
         binding.swipeRightApp.setOnLongClickListener(this)
         binding.toggleLock.setOnLongClickListener(this)
@@ -249,20 +243,6 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
                 R.id.alignmentCenter -> viewModel.updateHomeAlignment(Gravity.CENTER)
                 R.id.alignmentRight -> viewModel.updateHomeAlignment(Gravity.END)
                 R.id.alignmentBottom -> updateHomeBottomAlignment()
-            }
-        }
-    }
-
-    // "System" stays hidden unless the row is long pressed
-    private fun showAppThemeMenu(anchor: View, showSystem: Boolean) {
-        anchor.showPopupMenu(
-            R.menu.app_theme,
-            configure = { menu -> menu.findItem(R.id.themeSystem).isVisible = showSystem }
-        ) { item ->
-            when (item.itemId) {
-                R.id.themeLight -> updateTheme(AppCompatDelegate.MODE_NIGHT_NO)
-                R.id.themeDark -> updateTheme(AppCompatDelegate.MODE_NIGHT_YES)
-                R.id.themeSystem -> updateTheme(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             }
         }
     }
@@ -429,10 +409,23 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
             .setMessage("Current active streak: $streak days 🔥\nBest streak: $best days\nRequirement: $reqText\n\nFreeze Shield: $shieldStatus\nFreezes remaining: $remaining / 3 this month")
             .setPositiveButton(R.string.okay, null)
             .setNeutralButton("Reset Streak") { _, _ ->
-                prefs.habitStreakCount = 0
-                populateDisciplineSettings()
-                viewModel.refreshHome.postValue(false)
-                requireContext().showToast("Streak reset to 0.")
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Reset Streak")
+                    .setMessage("Choose reset option:\n\n• Reset Current Streak: drops active streak to 0, preserves Personal Best ($best days).\n• Reset All: clears both active streak and Personal Best to 0.")
+                    .setPositiveButton("Reset Current") { _, _ ->
+                        DisciplineManager.resetStreakFull(requireContext(), resetBestStreak = false)
+                        populateDisciplineSettings()
+                        viewModel.refreshHome.postValue(false)
+                        requireContext().showToast("Active streak reset to 0.")
+                    }
+                    .setNegativeButton("Reset All") { _, _ ->
+                        DisciplineManager.resetStreakFull(requireContext(), resetBestStreak = true)
+                        populateDisciplineSettings()
+                        viewModel.refreshHome.postValue(false)
+                        requireContext().showToast("All streaks reset to 0.")
+                    }
+                    .setNeutralButton(android.R.string.cancel, null)
+                    .show()
             }
 
         if (!isShieldActive && remaining > 0) {
@@ -647,42 +640,6 @@ class SettingsFragment : BaseFragment(), View.OnClickListener, View.OnLongClickL
         } else {
             prefs.autoShowKeyboard = !prefs.autoShowKeyboard
             populateKeyboardText()
-        }
-    }
-
-    private fun updateTheme(appTheme: Int) {
-        if (AppCompatDelegate.getDefaultNightMode() == appTheme) return
-        prefs.appTheme = appTheme
-        populateAppThemeText(appTheme)
-        setAppTheme(appTheme)
-    }
-
-    private fun setAppTheme(theme: Int) {
-        if (AppCompatDelegate.getDefaultNightMode() == theme) return
-        if (prefs.dailyWallpaper) {
-            setPlainWallpaper(theme)
-            viewModel.setWallpaperWorker()
-        }
-        requireActivity().recreate()
-    }
-
-    private fun setPlainWallpaper(appTheme: Int) {
-        when (appTheme) {
-            AppCompatDelegate.MODE_NIGHT_YES -> setPlainWallpaper(requireContext(), android.R.color.black)
-            AppCompatDelegate.MODE_NIGHT_NO -> setPlainWallpaper(requireContext(), android.R.color.white)
-            else -> {
-                if (requireContext().isDarkThemeOn())
-                    setPlainWallpaper(requireContext(), android.R.color.black)
-                else setPlainWallpaper(requireContext(), android.R.color.white)
-            }
-        }
-    }
-
-    private fun populateAppThemeText(appTheme: Int = prefs.appTheme) {
-        when (appTheme) {
-            AppCompatDelegate.MODE_NIGHT_YES -> binding.appThemeText.text = getString(R.string.dark)
-            AppCompatDelegate.MODE_NIGHT_NO -> binding.appThemeText.text = getString(R.string.light)
-            else -> binding.appThemeText.text = getString(R.string.system_default)
         }
     }
 

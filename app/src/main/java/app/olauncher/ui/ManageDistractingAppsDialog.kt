@@ -10,11 +10,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.olauncher.R
-import app.olauncher.data.Prefs
 import app.olauncher.databinding.DialogManageDistractingAppsBinding
 import app.olauncher.databinding.ItemDistractingAppBinding
 import app.olauncher.helper.DisciplineManager
 import app.olauncher.helper.OlDialog
+import app.olauncher.helper.showToast
 
 object ManageDistractingAppsDialog {
 
@@ -41,6 +41,9 @@ object ManageDistractingAppsDialog {
 
         binding.btnDoneDistractingApps.setOnClickListener {
             dialog.dismiss()
+        }
+
+        dialog.setOnDismissListener {
             onSaved()
         }
 
@@ -78,9 +81,8 @@ object ManageDistractingAppsDialog {
                         .setMessage("Removing \"${item.label}\" weakens your focus barrier.\n\nPenalty: Breaking this discipline commitment will immediately reset your focus streak to 0.\n\nAre you sure you want to proceed?")
                         .setPositiveButton("Proceed & Reset Streak") { _, _ ->
                             DisciplineManager.setAppDistracting(context, item.packageName, false)
-                            val prefs = Prefs(context)
-                            prefs.habitStreakCount = 0
-                            prefs.manualStreakUpdatedDate = ""
+                            DisciplineManager.resetStreakFull(context)
+                            context.showToast("${item.label} un-guarded • Streak reset to 0")
                             notifyItemChanged(position)
                         }
                         .setNegativeButton("Cancel (Keep Guarded)", null)

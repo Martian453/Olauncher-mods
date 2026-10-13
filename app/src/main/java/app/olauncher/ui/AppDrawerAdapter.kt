@@ -359,9 +359,7 @@ class AppDrawerAdapter(
                         .setMessage("Removing \"${appModel.appLabel}\" weakens your focus barrier.\n\nPenalty: Breaking this discipline commitment will immediately reset your focus streak to 0.\n\nAre you sure you want to proceed?")
                         .setPositiveButton("Proceed & Reset Streak") { _, _ ->
                             DisciplineManager.setAppDistracting(root.context, appModel.appPackage, false)
-                            val prefs = Prefs(root.context)
-                            prefs.habitStreakCount = 0
-                            prefs.manualStreakUpdatedDate = ""
+                            DisciplineManager.resetStreakFull(root.context)
                             appHideLayout.visibility = View.GONE
                             appTitle.visibility = View.VISIBLE
                             appTitle.text = buildString {
