@@ -25,6 +25,7 @@ import app.olauncher.data.Constants
 import app.olauncher.data.Prefs
 import app.olauncher.databinding.ActivityMainBinding
 import app.olauncher.helper.DisciplineManager
+import app.olauncher.receiver.StreakReminderReceiver
 import app.olauncher.helper.getColorFromAttr
 import app.olauncher.helper.hasBeenDays
 import app.olauncher.helper.hasBeenHours
@@ -121,6 +122,12 @@ class MainActivity : AppCompatActivity() {
         setupOrientation()
 
         DisciplineManager.initializeIfNeeded(this)
+        StreakReminderReceiver.scheduleDailyReminder(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
+            }
+        }
         registerReceiver(unlockReceiver, IntentFilter(Intent.ACTION_USER_PRESENT))
 
         window.addFlags(FLAG_LAYOUT_NO_LIMITS)

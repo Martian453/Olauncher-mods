@@ -849,4 +849,10 @@ class Prefs(context: Context) {
     var pendingTomorrowTasksJson: String
         get() = prefs.getString(PENDING_TOMORROW_TASKS_JSON, "").toString()
         set(value) = prefs.edit { putString(PENDING_TOMORROW_TASKS_JSON, value).apply() }
+
+    private val LAST_STREAK_REMINDER_SKIPPED_DATE = "LAST_STREAK_REMINDER_SKIPPED_DATE"
+
+    var lastStreakReminderSkippedDate: String
+        get() = prefs.getString(LAST_STREAK_REMINDER_SKIPPED_DATE, "").toString()
+        set(value) = prefs.edit { putString(LAST_STREAK_REMINDER_SKIPPED_DATE, value).apply() }
 }

@@ -58,7 +58,7 @@ data class MilestoneBadge(
 
 object DisciplineManager {
 
-    private fun getTodayDateString(): String {
+    fun getTodayDateString(): String {
         return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
     }
 
